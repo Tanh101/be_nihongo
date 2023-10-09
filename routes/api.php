@@ -21,17 +21,17 @@ use Illuminate\Support\Facades\Route;
 
 //Auth API
 Route::group(['prefix' => 'auth'], function () {
-    Route::post("register", [AuthController::class, "register"]);
-    Route::post("login", [AuthController::class, "login"]);
+    Route::post("register", [AuthController::class, "register"])->name('register');
+    Route::post("login", [AuthController::class, "login"])->name('login');
 });
 
 Route::group([
     'prefix' => 'auth',
     'middleware' => [
-        'auth',
+        'checkLogin',
     ],
 ], function () {
-    Route::get("profile", [AuthController::class, "user_profile"]);
-    Route::post("logout", [AuthController::class, "logout"]);
-    Route::post("refresh", [AuthController::class, "refresh"]);
+    Route::get("profile", [AuthController::class, "user_profile"])->name('profile');
+    Route::post("logout", [AuthController::class, "logout"])->name('logout');
+    Route::post("refresh", [AuthController::class, "refresh"])->name('refresh');
 });
