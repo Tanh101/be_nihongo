@@ -50,10 +50,31 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
+            return response()->json($validator->errors()->toJson(), 400);
+        }
+
+        $user = User::where('email', $request->email)->first();
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email does not exist in the system',
+            ], 400);
+        }
+
+        if ($user->status == 'inactive') {
+            return response()->json([
+                'success' => false,
+                'message' => 'User is inactive',
+            ], 400);
+        }
+
+        $user = User::where('email', $request->email)->first();
+
+        if ($validator->fails()) {
             return response()->json($validator->errors(), 400);
         }
 
-        if (! $token = auth()->attempt($validator->validated())) {
+        if (!$token = auth()->attempt($validator->validated())) {
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
@@ -62,6 +83,15 @@ class AuthController extends Controller
 
     public function logout()
     {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'User not found',
+            ], 400);
+        }
+
         Auth::logout();
 
         return response()->json([
@@ -69,11 +99,13 @@ class AuthController extends Controller
         ], 200);
     }
 
-    public function refresh() {
+    public function refresh()
+    {
         return $this->createNewToken(auth()->refresh());
     }
 
-    protected function createNewToken($token){
+    protected function createNewToken($token)
+    {
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
