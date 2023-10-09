@@ -22,6 +22,16 @@ use Illuminate\Support\Facades\Route;
 //Auth API
 Route::group(['prefix' => 'auth'], function () {
     Route::post("register", [AuthController::class, "register"]);
-    // Route::post("login", [AuthController::class, "login"]);
-    // Route::post("logout", [AuthController::class, "logout"]);
+    Route::post("login", [AuthController::class, "login"]);
+});
+
+Route::group([
+    'prefix' => 'auth',
+    'middleware' => [
+        'auth',
+    ],
+], function () {
+    Route::get("profile", [AuthController::class, "user_profile"]);
+    Route::post("logout", [AuthController::class, "logout"]);
+    Route::post("refresh", [AuthController::class, "refresh"]);
 });
