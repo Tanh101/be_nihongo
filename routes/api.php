@@ -35,3 +35,15 @@ Route::group([
     Route::post("logout", [AuthController::class, "logout"])->name('logout');
     Route::post("refresh", [AuthController::class, "refresh"])->name('refresh');
 });
+
+//Admin API
+Route::group([
+    'prefix' => 'dashboard',
+    'middleware' => [
+        'checkLogin',
+        'checkAdmin',
+        'verifyToken'
+    ],
+], function () {
+    Route::get('users', [AuthController::class, "get_all_users"])->name('users');
+});

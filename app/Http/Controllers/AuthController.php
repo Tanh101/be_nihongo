@@ -109,7 +109,7 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 3600,
+            'expires_in' => auth()->factory()->getTTL() * 1 / 60,
             'user' => auth()->user()
         ], 200);
     }
@@ -122,6 +122,17 @@ class AuthController extends Controller
             'success' => true,
             'message' => 'User profile',
             'user' => $user
+        ], 200);
+    }
+
+    public function get_all_users(Request $request)
+    {
+        $users = User::all();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'All users',
+            'users' => $users
         ], 200);
     }
 }
