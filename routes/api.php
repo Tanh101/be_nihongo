@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\LessonController;
+use App\Http\Controllers\TopicController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -45,5 +48,25 @@ Route::group([
         'verifyToken'
     ],
 ], function () {
-    Route::get('users', [AuthController::class, "get_all_users"])->name('users');
+    Route::get('users', [UserController::class, "get_all_users"])->name('users');
+    Route::patch('users/{id}', [UserController::class, "update_status"])->name('ban_unban');
+    Route::get("lessons", [LessonController::class, "get_all_lessons"]);
+    Route::post("lessons", [LessonController::class, "create_lesson"]);
+    Route::put("lessons/{id}", [LessonController::class, "update_lesson"]);
+    Route::delete("lessons/{id}", [LessonController::class, "delete_lesson"]);
+});
+
+//Topics API
+Route::group([
+    'prefix' => 'topics',
+    'middleware' => [
+        'checkLogin',
+        'checkAdmin',
+        'verifyToken'
+    ],
+], function () {
+    Route::get("/", [TopicController::class, "get_all_topics"]);
+    Route::post("/", [TopicController::class, "create_topic"]);
+    Route::put("{id}", [TopicController::class, "update_topic"]);
+    Route::delete("{id}", [TopicController::class, "delete_topic"]);
 });

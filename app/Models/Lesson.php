@@ -22,5 +22,12 @@ class Lesson extends Model
         return $this->belongsToMany(User::class);
     }
 
+    protected $fillable = [
+        'topic_id',
+        'title',
+        'description',
+        'image',
+    ];
+
     use HasFactory;
 }

@@ -11,5 +11,13 @@ class Topic extends Model
     {
         return $this->hasMany(Lesson::class);
     }
+
+    protected $fillable = [
+        'name',
+        'description',
+        'image',
+        'status',
+    ];
+    
     use HasFactory;
 }
