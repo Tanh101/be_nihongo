@@ -50,10 +50,6 @@ Route::group([
 ], function () {
     Route::get('users', [UserController::class, "get_all_users"])->name('users');
     Route::patch('users/{id}', [UserController::class, "update_status"])->name('ban_unban');
-    Route::get("lessons", [LessonController::class, "get_all_lessons"]);
-    Route::post("lessons", [LessonController::class, "create_lesson"]);
-    Route::put("lessons/{id}", [LessonController::class, "update_lesson"]);
-    Route::delete("lessons/{id}", [LessonController::class, "delete_lesson"]);
 });
 
 //Topics API
@@ -79,4 +75,29 @@ Route::group([
 ], function () {
     Route::get("{id}", [TopicController::class, "get_topic"]);
     Route::get("/", [TopicController::class, "get_all_topics"]);
+});
+
+//Lessons API
+Route::group([
+    'prefix' => 'lessons',
+    'middleware' => [
+        'checkLogin',
+        'checkAdmin',
+        'verifyToken'
+    ],
+], function () {
+    Route::post("/", [LessonController::class, "create_lesson"]);
+    Route::put("{id}", [LessonController::class, "update_lesson"]);
+    Route::delete("{id}", [LessonController::class, "delete_lesson"]);
+});
+
+Route::group([
+    'prefix' => 'lessons',
+    'middleware' => [
+        'checkLogin',
+        'verifyToken'
+    ],
+], function () {
+    Route::get("/", [LessonController::class, "get_all_lessons"]);
+    Route::get("{id}", [LessonController::class, "get_lesson"]);
 });
