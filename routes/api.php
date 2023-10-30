@@ -65,8 +65,18 @@ Route::group([
         'verifyToken'
     ],
 ], function () {
-    Route::get("/", [TopicController::class, "get_all_topics"]);
     Route::post("/", [TopicController::class, "create_topic"]);
     Route::put("{id}", [TopicController::class, "update_topic"]);
     Route::delete("{id}", [TopicController::class, "delete_topic"]);
+});
+
+Route::group([
+    'prefix' => 'topics',
+    'middleware' => [
+        'checkLogin',
+        'verifyToken'
+    ],
+], function () {
+    Route::get("{id}", [TopicController::class, "get_topic"]);
+    Route::get("/", [TopicController::class, "get_all_topics"]);
 });

@@ -15,36 +15,33 @@ class AuthController extends Controller
      *     path="/api/auth/register",
      *     summary="Register a new user",
      *     tags={"Auth"},
-     *     @OA\Parameter(
-     *         name="name",
-     *         in="query",
-     *         description="Name",
-     *         required=true,
-     *         @OA\Schema(type="string")
-     *     ),
-     *     @OA\Parameter(
-     *         name="email",
-     *         in="query",
-     *         description="Email",
-     *         required=true,
-     *         @OA\Schema(type="string")
-     *     ),
-     *     @OA\Parameter(
-     *         name="password",
-     *         in="query",
-     *         description="Password",
-     *         required=true,
-     *         @OA\Schema(type="string")
-     *     ),
-     *      @OA\Parameter(
-     *         name="password_confirmation",
-     *         in="query",
-     *         description="Confirm password",
-     *         required=true,
-     *         @OA\Schema(type="string")
-     *     ),
-     *     @OA\Response(response="200", description="User registered successfully"),
-     *     @OA\Response(response="422", description="Validation errors")
+     *     @OA\RequestBody(
+     *       required=true,
+     *       @OA\JsonContent(
+     *           @OA\Property(
+     *               property="name",
+     *               type="string",
+     *               description="Name"
+     *           ),
+     *           @OA\Property(
+     *              property="email",
+     *              type="string",
+     *              description="Email"
+     *          ),
+     *          @OA\Property(
+     *              property="password",
+     *              type="string",
+     *              description="Password"
+     *          ),
+     *          @OA\Property(
+     *              property="password_confirmation",
+     *              type="string",
+     *              description="Password confirmation"
+     *          )
+     *       )
+     *   ),
+     *   @OA\Response(response="200", description="User registered successfully"),
+     *   @OA\Response(response="400", description="Validation errors")
      * )
      */
     public function register(Request $request)
@@ -84,23 +81,24 @@ class AuthController extends Controller
      *     path="/api/auth/login",
      *     summary="Login User",
      *     tags={"Auth"},
-     *     @OA\Parameter(
-     *         name="email",
-     *         in="query",
-     *         description="Email",
-     *         required=true,
-     *         @OA\Schema(type="string")
-     *     ),
-     *     @OA\Parameter(
-     *         name="password",
-     *         in="query",
-     *         description="Password",
-     *         required=true,
-     *         @OA\Schema(type="string")
-     *     ),
+     *     @OA\RequestBody(
+     *       required=true,
+     *       @OA\JsonContent(
+     *           @OA\Property(
+     *              property="email",
+     *              type="string",
+     *              description="Email"
+     *          ),
+     *          @OA\Property(
+     *              property="password",
+     *              type="string",
+     *              description="Password"
+     *          )
+     *       )
+     *   ),
      *     @OA\Response(response="200", description="Logged in successfully"),
      *     @OA\Response(response="400", description="Validation errors"),
-     *      @OA\Response(response="401", description="Password incorrect"),
+     *     @OA\Response(response="401", description="Password incorrect"),
      * )
      */
     public function login(Request $request)
@@ -190,7 +188,7 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 1 / 60,
+            'expires_in' => auth()->factory()->getTTL() * 60,
             'user' => auth()->user()
         ], 200);
     }

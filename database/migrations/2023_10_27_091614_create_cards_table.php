@@ -17,7 +17,8 @@ return new class extends Migration
             $table->foreign('word_id')->references('id')->on('words')->onDelete('cascade');
             $table->unsignedBigInteger('flashcard_id');
             $table->foreign('flashcard_id')->references('id')->on('flashcards')->onDelete('cascade');
-            $table->string('status');
+            $table->string('status')->default('active');
+            $table->string('image')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

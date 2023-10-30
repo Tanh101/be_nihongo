@@ -17,8 +17,8 @@ return new class extends Migration
             $table->foreign('topic_id')->references('id')->on('topics')->onDelete('cascade');
             $table->string('title');
             $table->string('description')->nullable();
-            $table->string('image');
-            $table->string('status');
+            $table->string('image')->nullable();
+            $table->string('status')->default('active');
             $table->softDeletes();
             $table->timestamps();
         });

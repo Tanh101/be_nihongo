@@ -11,13 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('topics', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('description')->nullable();
-            $table->string('image')->nullable();
-            $table->softDeletes();
-            $table->timestamps();
+        Schema::table('topics', function (Blueprint $table) {
+            $table->string('image')->nullable()->change();
+            $table->string('description')->nullable()->change();
         });
     }
 
@@ -26,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('topics');
+        //
     }
 };
