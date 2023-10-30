@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreign('vocabulary_id')->references('id')->on('vocabularies')->onDelete('cascade');
             $table->string('content');
             $table->string('meaning');
-            $table->string('status');
+            $table->string('status')->default('active');
             $table->softDeletes();
             $table->timestamps();
         });

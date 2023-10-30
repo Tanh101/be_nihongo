@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Word extends Model
 {
@@ -22,5 +23,5 @@ class Word extends Model
         return $this->belongsTo(Card::class);
     }
 
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 }
