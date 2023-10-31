@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreign('lesson_id')->references('id')->on('lessons')->onDelete('cascade');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
-            $table->unsignedBigInteger('word_id');
+            $table->unsignedBigInteger('word_id')->unique();
             $table->foreign('word_id')->references('id')->on('words')->onDelete('cascade');
             $table->string('status')->default('active');
             $table->softDeletes();
