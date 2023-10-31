@@ -2,17 +2,18 @@
 
 namespace Database\Seeders;
 
-use App\Models\Lesson;
+use App\Models\Vocabulary;
+use App\Models\Word;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class LessonSeeder extends Seeder
+class WordSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        Lesson::factory(20)->create();
+        Word::factory()->count(10)->create();
     }
 }
