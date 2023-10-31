@@ -10,6 +10,40 @@ use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
+    /**
+     * @OA\Post(
+     *     path="/api/auth/register",
+     *     summary="Register a new user",
+     *     tags={"Auth"},
+     *     @OA\RequestBody(
+     *       required=true,
+     *       @OA\JsonContent(
+     *           @OA\Property(
+     *               property="name",
+     *               type="string",
+     *               description="Name"
+     *           ),
+     *           @OA\Property(
+     *              property="email",
+     *              type="string",
+     *              description="Email"
+     *          ),
+     *          @OA\Property(
+     *              property="password",
+     *              type="string",
+     *              description="Password"
+     *          ),
+     *          @OA\Property(
+     *              property="password_confirmation",
+     *              type="string",
+     *              description="Password confirmation"
+     *          )
+     *       )
+     *   ),
+     *   @OA\Response(response="200", description="User registered successfully"),
+     *   @OA\Response(response="400", description="Validation errors")
+     * )
+     */
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -42,6 +76,31 @@ class AuthController extends Controller
         ], 200);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/auth/login",
+     *     summary="Login User",
+     *     tags={"Auth"},
+     *     @OA\RequestBody(
+     *       required=true,
+     *       @OA\JsonContent(
+     *           @OA\Property(
+     *              property="email",
+     *              type="string",
+     *              description="Email"
+     *          ),
+     *          @OA\Property(
+     *              property="password",
+     *              type="string",
+     *              description="Password"
+     *          )
+     *       )
+     *   ),
+     *     @OA\Response(response="200", description="Logged in successfully"),
+     *     @OA\Response(response="400", description="Validation errors"),
+     *     @OA\Response(response="401", description="Password incorrect"),
+     * )
+     */
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -75,12 +134,23 @@ class AuthController extends Controller
         }
 
         if (!$token = auth()->attempt($validator->validated())) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Password incorrect'], 401);
         }
 
         return $this->createNewToken($token);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/auth/logout",
+     *     summary="Logout User",
+     *     tags={"Auth"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Response(response="200", description="Logged out successfully"),
+     *     @OA\Response(response="400", description="User is not logged in"),
+     *     @OA\Response(response="401", description="Password incorrect"),
+     * )
+     */
     public function logout()
     {
         $user = Auth::user();
@@ -88,17 +158,26 @@ class AuthController extends Controller
         if (!$user) {
             return response()->json([
                 'success' => false,
-                'message' => 'User not found',
+                'message' => 'User is not logged in',
             ], 400);
         }
 
         Auth::logout();
 
         return response()->json([
-            'message' => 'Successfully logged out',
+            'message' => 'Logged out successfully',
         ], 200);
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/auth/refresh",
+     *     summary="Refresh Token",
+     *     tags={"Auth"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Response(response="200", description="Refresh token successfully"),
+     * )
+     */
     public function refresh()
     {
         return $this->createNewToken(auth()->refresh());
@@ -109,18 +188,27 @@ class AuthController extends Controller
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 3600,
+            'expires_in' => auth()->factory()->getTTL() * 60*60,
             'user' => auth()->user()
         ], 200);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/auth/profile",
+     *     summary="Refresh Token",
+     *     tags={"Auth"},
+     *     security={{"bearerAuth": {}}},
+     *     @OA\Response(response="200", description="Get user profile successfully"),
+     * )
+     */
     public function user_profile()
     {
         $user = auth()->user();
 
         return response()->json([
             'success' => true,
-            'message' => 'User profile',
+            'message' => 'Get user profile successfully',
             'user' => $user
         ], 200);
     }

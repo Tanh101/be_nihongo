@@ -17,9 +17,12 @@ class checkAdmin
     public function handle(Request $request, Closure $next): Response
     {
         $user = Auth::user();
-        if ($user->role !== 'admin') {
+        if ($user->role === 'admin') {
             return $next($request);
         }
-        return back()->with('error', 'You are not allowed to access this page');
+        return response()->json([
+            'success' => false,
+            'message' => 'You are not admin',
+        ], 403);
     }
 }
