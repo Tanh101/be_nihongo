@@ -13,5 +13,11 @@ class Answer extends Model
         return $this->belongsTo(Question::class);
     }
 
+    protected $fillable = [
+        'question_id',
+        'content',
+        'is_correct',
+        'status',
+    ];
     use HasFactory, SoftDeletes;
 }

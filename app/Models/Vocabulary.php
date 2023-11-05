@@ -28,7 +28,11 @@ class Vocabulary extends Model
         return $this->hasMany(Question::class);
     }
 
-    
+    protected $fillable = [
+        'lesson_id',
+        'word_id',
+        'user_id',
+    ];
 
     use HasFactory, SoftDeletes;
 }
