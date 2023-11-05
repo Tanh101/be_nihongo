@@ -392,6 +392,42 @@
                 ]
             }
         },
+        "/api/lessons/{id}": {
+            "get": {
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Get all lessons by status",
+                "operationId": "2845e53c75b318009dda0c0c26891f8e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Lesson ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get vocabularies, questions and aswers is successfully"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    },
+                    "404": {
+                        "description": "Lessons not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/dashboard/topics": {
             "get": {
                 "tags": [
@@ -834,6 +870,110 @@
                     },
                     "400": {
                         "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/dashboard/vocabularies": {
+            "post": {
+                "tags": [
+                    "Vocabylary and Question"
+                ],
+                "summary": "Create vocabularies and questions",
+                "operationId": "7bda04bc86c474391d2fbfc88e50b0c3",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "lesson_id": {
+                                        "description": "Lesson ID",
+                                        "type": "string"
+                                    },
+                                    "vocabularies": {
+                                        "description": "Vocabularies",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "word": {
+                                                    "description": "Word",
+                                                    "type": "string"
+                                                },
+                                                "meaning": {
+                                                    "description": "Meaning",
+                                                    "type": "string"
+                                                },
+                                                "pronunciation": {
+                                                    "description": "Pronunciation",
+                                                    "type": "string"
+                                                },
+                                                "image": {
+                                                    "description": "Image",
+                                                    "type": "string"
+                                                },
+                                                "questions": {
+                                                    "description": "Questions",
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "content": {
+                                                                "description": "Content",
+                                                                "type": "string"
+                                                            },
+                                                            "meaning": {
+                                                                "description": "Meaning",
+                                                                "type": "string"
+                                                            },
+                                                            "answer": {
+                                                                "description": "Answer",
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "properties": {
+                                                                        "content": {
+                                                                            "description": "Content",
+                                                                            "type": "string"
+                                                                        },
+                                                                        "is_correct": {
+                                                                            "description": "Is Correct",
+                                                                            "type": "integer"
+                                                                        }
+                                                                    },
+                                                                    "type": "object",
+                                                                    "example": {
+                                                                        "content": "answer 1",
+                                                                        "is_correct": 1
+                                                                    }
+                                                                }
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Create vocabulaies and questions successfully"
+                    },
+                    "404": {
+                        "description": "lesson not found"
+                    },
+                    "500": {
+                        "description": "Server error"
                     }
                 },
                 "security": [

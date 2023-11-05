@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\TopicController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VocabularyController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -61,11 +62,14 @@ Route::group([
 
     //topics
     Route::post("topics/", [TopicController::class, "create_topic"]);
-    Route::put("topics/{id}", [TopicController::class, "update_topic"]);    
+    Route::put("topics/{id}", [TopicController::class, "update_topic"]);
     Route::delete("topics/{id}", [TopicController::class, "delete_topic"]);
     Route::get('topics', [TopicController::class, "get_all_topics_by_admin"]);
     Route::patch('topics/{id}', [TopicController::class, "restore_topic"]);
     Route::get("topics/{id}", [TopicController::class, "get_topic"]);
+
+    //vocabulary
+    Route::post("vocabularies", [VocabularyController::class, "create_vocabularies_questions"]);
 });
 
 //Topics API
@@ -87,5 +91,5 @@ Route::group([
         'verifyToken'
     ],
 ], function () {
-    Route::get("lessons/{id}", [LessonController::class, "get_lesson_by_id"]);
+    Route::get("{id}", [LessonController::class, "getVocabulariesByLessonId"]);
 });
