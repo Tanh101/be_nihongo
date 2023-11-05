@@ -1,0 +1,996 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Swagger with Laravel",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/auth/register": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Register a new user",
+                "operationId": "d764dd091cc4494ae0baf360b03319f3",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "description": "Name",
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "description": "Email",
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "description": "Password",
+                                        "type": "string"
+                                    },
+                                    "password_confirmation": {
+                                        "description": "Password confirmation",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "User registered successfully"
+                    },
+                    "400": {
+                        "description": "Validation errors"
+                    }
+                }
+            }
+        },
+        "/api/auth/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Login User",
+                "operationId": "8dcb70df1020986038d098cc08d05dae",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "email": {
+                                        "description": "Email",
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "description": "Password",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Logged in successfully"
+                    },
+                    "400": {
+                        "description": "Validation errors"
+                    },
+                    "401": {
+                        "description": "Password incorrect"
+                    }
+                }
+            }
+        },
+        "/api/auth/logout": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logout User",
+                "operationId": "69281b12abb272c76871f19cb17ca563",
+                "responses": {
+                    "200": {
+                        "description": "Logged out successfully"
+                    },
+                    "400": {
+                        "description": "User is not logged in"
+                    },
+                    "401": {
+                        "description": "Password incorrect"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/refresh": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Refresh Token",
+                "operationId": "b2eae7a8032954d25b46c7ec6f489c68",
+                "responses": {
+                    "200": {
+                        "description": "Refresh token successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/auth/profile": {
+            "get": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Refresh Token",
+                "operationId": "4f2022f7a8c1bb8c67ef3c22a8f8cadf",
+                "responses": {
+                    "200": {
+                        "description": "Get user profile successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/dashboard/lessons": {
+            "get": {
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Get all lessons by status",
+                "operationId": "ad8c9ec020fefcd2c273b341b44e8935",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Status",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "active",
+                                "deleted"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                10,
+                                15,
+                                20
+                            ]
+                        }
+                    },
+                    {
+                        "name": "cur_page",
+                        "in": "query",
+                        "description": "Current page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get lessons successfully"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    },
+                    "404": {
+                        "description": "Lessons not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Create a new lesson",
+                "operationId": "f0146d08f55eb8b36646a134f3e9e0ce",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "description": "Title",
+                                        "type": "string"
+                                    },
+                                    "topic_id": {
+                                        "description": "Topic ID",
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "description": "Description",
+                                        "type": "string"
+                                    },
+                                    "image": {
+                                        "description": "Image",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Create lesson successfully"
+                    },
+                    "400": {
+                        "description": "Validation errors"
+                    },
+                    "404": {
+                        "description": "Topic not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/dashboard/lessons/{id}": {
+            "put": {
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Update a lesson by ID",
+                "operationId": "7a9f05272afd07a2a99ef9e2ebf80e30",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "title": {
+                                        "description": "Title",
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "description": "Description",
+                                        "type": "string"
+                                    },
+                                    "image": {
+                                        "description": "Image",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Update lesson successfully"
+                    },
+                    "404": {
+                        "description": "Lesson not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Delete a lesson by ID",
+                "operationId": "6eb7bde162851f87658009526e2e0cd6",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delete lesson successfully"
+                    },
+                    "404": {
+                        "description": "Lesson not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Restore a lesson by ID",
+                "operationId": "18a3fe9a8ecf6b2e13af16e13da66443",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Restore lesson successfully"
+                    },
+                    "404": {
+                        "description": "Lesson not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/lessons/{id}": {
+            "get": {
+                "tags": [
+                    "Lessons"
+                ],
+                "summary": "Get all lessons by status",
+                "operationId": "2845e53c75b318009dda0c0c26891f8e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Lesson ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get vocabularies, questions and aswers is successfully"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    },
+                    "404": {
+                        "description": "Lessons not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/dashboard/topics": {
+            "get": {
+                "tags": [
+                    "Topics"
+                ],
+                "summary": "Get all topics by admin",
+                "operationId": "8376324ece13b8a38bb9eb8b7284830a",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Status",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "deleted"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                10,
+                                15,
+                                20
+                            ]
+                        }
+                    },
+                    {
+                        "name": "cur_page",
+                        "in": "query",
+                        "description": "Current page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get topics successfully"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    },
+                    "404": {
+                        "description": "Topics not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Topics"
+                ],
+                "summary": "Create a new topic",
+                "operationId": "caf4e0316abdc144977dfed446269fb2",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "description": "Name",
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "description": "Description",
+                                        "type": "string"
+                                    },
+                                    "image": {
+                                        "description": "Image",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Create topic successfully"
+                    },
+                    "400": {
+                        "description": "Validation errors"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/dashboard/topics/{id}": {
+            "get": {
+                "tags": [
+                    "Topics"
+                ],
+                "summary": "Get a topic by ID",
+                "operationId": "be970ed3d1208afaecbd19032fb3d395",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the topic",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get topic successfully"
+                    },
+                    "404": {
+                        "description": "Topic not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Topics"
+                ],
+                "summary": "Update a topic by ID",
+                "operationId": "594766ce34194297e6eef3a28cdfd811",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "description": "Name",
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "description": "Description",
+                                        "type": "string"
+                                    },
+                                    "image": {
+                                        "description": "Image",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Update topic successfully"
+                    },
+                    "404": {
+                        "description": "Topic not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Topics"
+                ],
+                "summary": "Delete a topic by ID",
+                "operationId": "1ff710db97f2cef1de93301ae3370a74",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the topic",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get topic successfully"
+                    },
+                    "404": {
+                        "description": "Topic not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "patch": {
+                "tags": [
+                    "Topics"
+                ],
+                "summary": "Restore a topic by ID",
+                "operationId": "e274211904675cbd16a33a54c8792829",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID of the topic",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Restore topic successfully"
+                    },
+                    "404": {
+                        "description": "Topic not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/topics": {
+            "get": {
+                "tags": [
+                    "Topics"
+                ],
+                "summary": "Get all topics with lessons",
+                "operationId": "ec4b7057fd148a795402e19556fb58dc",
+                "responses": {
+                    "200": {
+                        "description": "Get topics successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "topicId": {
+                                                "description": "Topic ID",
+                                                "type": "integer"
+                                            },
+                                            "topicName": {
+                                                "description": "Topic name",
+                                                "type": "string"
+                                            },
+                                            "topicImage": {
+                                                "description": "Topic image",
+                                                "type": "string"
+                                            },
+                                            "lessons": {
+                                                "description": "Lessons",
+                                                "type": "array",
+                                                "items": {
+                                                    "properties": {
+                                                        "lessonId": {
+                                                            "description": "Lesson ID",
+                                                            "type": "integer"
+                                                        },
+                                                        "lessonTitle": {
+                                                            "description": "Lesson title",
+                                                            "type": "string"
+                                                        },
+                                                        "lessonDescription": {
+                                                            "description": "Lesson description",
+                                                            "type": "string"
+                                                        },
+                                                        "lessonImage": {
+                                                            "description": "Lesson image",
+                                                            "type": "string"
+                                                        },
+                                                        "status": {
+                                                            "description": "Status",
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "type": "object"
+                                                }
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Server error"
+                    },
+                    "404": {
+                        "description": "Topics not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/dashboard/users": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Get all users by status",
+                "operationId": "9e819e87d0eab6fac66a06bcc4c3e560",
+                "parameters": [
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Status",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "active",
+                                "inactive",
+                                "banned"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Items per page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "enum": [
+                                10,
+                                20,
+                                15
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get users successfully"
+                    },
+                    "404": {
+                        "description": "Users not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/dashboard/users/{id}": {
+            "patch": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Update a user's status by ID",
+                "operationId": "eca7f6cbe3788e53ac012d046635a205",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "description": "Status",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "active",
+                                "inactive",
+                                "banned"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Update user's status successfully"
+                    },
+                    "404": {
+                        "description": "User not found"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/dashboard/vocabularies": {
+            "post": {
+                "tags": [
+                    "Vocabylary and Question"
+                ],
+                "summary": "Create vocabularies and questions",
+                "operationId": "7bda04bc86c474391d2fbfc88e50b0c3",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "lesson_id": {
+                                        "description": "Lesson ID",
+                                        "type": "string"
+                                    },
+                                    "vocabularies": {
+                                        "description": "Vocabularies",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "word": {
+                                                    "description": "Word",
+                                                    "type": "string"
+                                                },
+                                                "meaning": {
+                                                    "description": "Meaning",
+                                                    "type": "string"
+                                                },
+                                                "pronunciation": {
+                                                    "description": "Pronunciation",
+                                                    "type": "string"
+                                                },
+                                                "image": {
+                                                    "description": "Image",
+                                                    "type": "string"
+                                                },
+                                                "questions": {
+                                                    "description": "Questions",
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "content": {
+                                                                "description": "Content",
+                                                                "type": "string"
+                                                            },
+                                                            "meaning": {
+                                                                "description": "Meaning",
+                                                                "type": "string"
+                                                            },
+                                                            "answer": {
+                                                                "description": "Answer",
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "properties": {
+                                                                        "content": {
+                                                                            "description": "Content",
+                                                                            "type": "string"
+                                                                        },
+                                                                        "is_correct": {
+                                                                            "description": "Is Correct",
+                                                                            "type": "integer"
+                                                                        }
+                                                                    },
+                                                                    "type": "object",
+                                                                    "example": {
+                                                                        "content": "answer 1",
+                                                                        "is_correct": 1
+                                                                    }
+                                                                }
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Create vocabulaies and questions successfully"
+                    },
+                    "404": {
+                        "description": "lesson not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    }
+}

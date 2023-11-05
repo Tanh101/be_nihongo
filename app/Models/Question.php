@@ -18,5 +18,12 @@ class Question extends Model
         return $this->hasMany(Answer::class);
     }
 
+    protected $fillable = [
+        'vocabulary_id',
+        'content',
+        'meaning',
+        'status',
+    ];
+
     use HasFactory, SoftDeletes;
 }
