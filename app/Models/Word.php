@@ -23,5 +23,12 @@ class Word extends Model
         return $this->belongsTo(Card::class);
     }
 
+    protected $fillable = [
+        'word',
+        'meaning',
+        'pronunciation',
+        'image',
+    ];
+
     use HasFactory, SoftDeletes;
 }

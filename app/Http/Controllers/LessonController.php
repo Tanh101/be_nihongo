@@ -86,24 +86,6 @@ class LessonController extends Controller
         ], 200);
     }
 
-    public function get_lesson_by_id($id)
-    {
-        $lesson = Lesson::with('vocabularies')->find($id)->get();
-
-        if (!$lesson) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Lesson not found',
-            ], 404);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Get lesson successfully',
-            'lesson' => $lesson
-        ], 200);
-    }
-
     /**
      * @OA\Post(
      *     path="/api/dashboard/lessons",
@@ -344,6 +326,43 @@ class LessonController extends Controller
             'success' => true,
             'message' => 'Restore lesson successfully',
             'lesson' => $lesson
+        ], 200);
+    }
+
+    /**
+     * @OA\Get(
+     *     path="/api/lessons/{id}",
+     *     summary="Get all lessons by status",
+     *     tags={"Lessons"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         description="Lesson ID",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer",
+     *         )
+     *     ),
+     *     @OA\Response(response="200", description="Get vocabularies, questions and aswers is successfully"),
+     *     @OA\Response(response="500", description="Server error"),
+     *     @OA\Response(response="404", description="Lessons not found"),
+     * )
+     */
+    public function getVocabulariesByLessonId(Request $request, $id)
+    {
+        $results = Lesson::find($id)->vocabularies()->load()->get();
+        if (!$results) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lesson not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Get vocabularies successfully',
+            'vocabularies' => $results
         ], 200);
     }
 }
