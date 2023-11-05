@@ -344,15 +344,181 @@ class LessonController extends Controller
      *             type="integer",
      *         )
      *     ),
-     *     @OA\Response(response="200", description="Get vocabularies, questions and aswers is successfully"),
+     *     @OA\Response(
+     *         response="200",
+     *         description="Get lesson successfully",
+     *         @OA\JsonContent(
+     *             @OA\Property(
+     *                  property="success",
+     *                  type="boolean",
+     *                  example=true
+     *             ),
+     *             @OA\Property(
+     *                  property="message",
+     *                  type="string",
+     *                  example="Get lesson successfully"
+     *             ),
+     *             @OA\Property(
+     *                 property="lesson",
+     *                 type="object",
+     *                 @OA\Property(
+     *                      property="id",
+     *                      type="integer",
+     *                      example=1
+     *                 ),
+     *                 @OA\Property(
+     *                      property="topic_id",
+     *                      type="integer",
+     *                 ),
+     *                 @OA\Property(
+     *                      property="title",
+     *                      type="string",
+     *                      example="Lesson 1"
+     *                 ),
+     *                 @OA\Property(
+     *                      property="description",
+     *                      type="string",
+     *                 ),
+     *                 @OA\Property(
+     *                      property="image",
+     *                      type="string",
+     *                 ),
+     *                 @OA\Property(
+     *                      property="status",
+     *                      type="string",
+     *                 ),
+     *                 @OA\Property(
+     *                      property="timestamp",
+     *                      type="string",
+     *                 ),
+     *                 @OA\Property(
+     *                      property="vocabularies",
+     *                      type="array",
+     *                      @OA\Items(
+     *                          @OA\Property(
+     *                              property="id",
+     *                              type="integer",
+     *                              example=1
+     *                          ),
+     *                          @OA\Property(
+     *                              property="lesson_id",
+     *                              type="integer",
+     *                          ),
+     *                          @OA\Property(
+     *                              property="user_id",
+     *                              type="integer",
+     *                          ),
+     *                          @OA\Property(
+     *                              property="word_id",
+     *                              type="integer",
+     *                          ),
+     *                          @OA\Property(
+     *                              property="status",
+     *                              type="string",
+     *                          ),
+     *                          @OA\Property(
+     *                              property="timestamp",
+     *                              type="string",
+     *                          ),
+     *                          @OA\Property(
+     *                              property="word",
+     *                              type="object",
+     *                              @OA\Property(
+     *                                  property="id",
+     *                                  type="integer",
+     *                              ),
+     *                              @OA\Property(
+     *                                  property="word",
+     *                                  type="string",
+     *                              ),
+     *                              @OA\Property(
+     *                                  property="pronunciation",
+     *                                  type="string",
+     *                              ),
+     *                              @OA\Property(
+     *                                  property="meaning",
+     *                                  type="string",
+     *                              ),
+     *                              @OA\Property(
+     *                                  property="image",
+     *                                  type="string",
+     *                              ),
+     *                              @OA\Property(
+     *                                  property="timestamp",
+     *                                  type="string",
+     *                              ),
+     *                           ),
+     *                           @OA\Property(
+     *                              property="questions",
+     *                              type="array",
+     *                              @OA\Items(
+     *                                  @OA\Property(
+     *                                      property="id",
+     *                                      type="integer",
+     *                                  ),
+     *                                  @OA\Property(
+     *                                      property="vocabulary_id",
+     *                                      type="integer",
+     *                                  ),
+     *                                  @OA\Property(
+     *                                      property="content",
+     *                                      type="string",
+     *                                  ),
+     *                                  @OA\Property(
+     *                                      property="meaning",
+     *                                      type="string",
+     *                                  ),
+     *                                  @OA\Property(
+     *                                      property="status",
+     *                                      type="string",
+     *                                  ),
+     *                                  @OA\Property(
+     *                                      property="timestamp",
+     *                                      type="string",
+     *                                  ),
+     *                                  @OA\Property(
+     *                                      property="answers",
+     *                                      type="array",
+     *                                      @OA\Items(
+     *                                          @OA\Property(
+     *                                              property="id",
+     *                                              type="integer",
+     *                                          ),
+     *                                          @OA\Property(
+     *                                              property="question_id",
+     *                                              type="integer",
+     *                                          ),
+     *                                          @OA\Property(
+     *                                              property="content",
+     *                                              type="string",
+     *                                          ),
+     *                                          @OA\Property(
+     *                                              property="is_correct",
+     *                                              type="integer",
+     *                                              enum={0, 1},
+     *                                          ),
+     *                                          @OA\Property(
+     *                                              property="timestamp",
+     *                                              type="string",
+     *                                          ),
+     *                                      ),
+     *                                  ),
+     *                              ),
+     *                          ),
+     *                      ),
+     *                 ),
+     *             ),
+     *         ),
+     *     ),
      *     @OA\Response(response="500", description="Server error"),
      *     @OA\Response(response="404", description="Lessons not found"),
      * )
      */
     public function getVocabulariesByLessonId(Request $request, $id)
     {
-        $results = Lesson::find($id)->vocabularies()->load()->get();
-        if (!$results) {
+        $result = Lesson::with('vocabularies.word', 'vocabularies.questions', 'vocabularies.questions.answers')
+            ->find($id);
+        if (!$result) {
             return response()->json([
                 'success' => false,
                 'message' => 'Lesson not found',
@@ -362,7 +528,7 @@ class LessonController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Get vocabularies successfully',
-            'vocabularies' => $results
+            'lesson' => $result
         ], 200);
     }
 }
