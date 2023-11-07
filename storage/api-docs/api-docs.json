@@ -153,6 +153,155 @@
                 ]
             }
         },
+        "/api/learn/{id}": {
+            "post": {
+                "tags": [
+                    "Learning"
+                ],
+                "summary": "Learn a lesson by id",
+                "operationId": "1c475d14e65b7e4bfa77c5a635683f64",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "You are learning this lesson",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "You are learning this lesson"
+                                        },
+                                        "lesson": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "topic_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Lesson 1"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "This is lesson 1"
+                                                },
+                                                "image": {
+                                                    "type": "string",
+                                                    "example": "https://www.google.com"
+                                                },
+                                                "status": {
+                                                    "type": "string",
+                                                    "example": "learning"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/check/{id}": {
+            "patch": {
+                "tags": [
+                    "Learning"
+                ],
+                "summary": "Check answer of question",
+                "operationId": "b08f161fd8944a0f230d8d482f0eb8b2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "question_id",
+                                    "answer"
+                                ],
+                                "properties": {
+                                    "question_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "answer": {
+                                        "type": "string",
+                                        "example": "answer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Correct answer",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Correct answer"
+                                        },
+                                        "correct_answer": {
+                                            "type": "string",
+                                            "example": "answer"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/dashboard/lessons": {
             "get": {
                 "tags": [
@@ -561,9 +710,6 @@
                                 }
                             }
                         }
-                    },
-                    "500": {
-                        "description": "Server error"
                     },
                     "404": {
                         "description": "Lessons not found"

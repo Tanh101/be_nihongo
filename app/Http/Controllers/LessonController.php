@@ -510,7 +510,6 @@ class LessonController extends Controller
      *             ),
      *         ),
      *     ),
-     *     @OA\Response(response="500", description="Server error"),
      *     @OA\Response(response="404", description="Lessons not found"),
      * )
      */
