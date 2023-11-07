@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\LearningController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\TopicController;
 use App\Http\Controllers\UserController;
@@ -92,4 +93,27 @@ Route::group([
     ],
 ], function () {
     Route::get("{id}", [LessonController::class, "getVocabulariesByLessonId"]);
+});
+
+
+//Learning API
+Route::group([
+    'prefix' => 'learn',
+    'middleware' => [
+        'checkLogin',
+        'verifyToken'
+    ],
+], function () {
+    Route::post("{id}", [LearningController::class, "learnBylessonId"]);
+});
+
+//check answer API
+Route::group([
+    'prefix' => 'check',
+    'middleware' => [
+        'checkLogin',
+        'verifyToken'
+    ],
+], function () {
+    Route::patch("{id}", [LearningController::class, "checkAnswer"]);
 });

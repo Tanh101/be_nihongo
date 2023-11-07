@@ -20,7 +20,7 @@ class Lesson extends Model
 
     public function user()
     {
-        return $this->belongsToMany(User::class)->withPivot('status')->withTimestamps();
+        return $this->belongsToMany(User::class)->withPivot('status', 'lives')->withTimestamps();
     }
 
     protected $fillable = [

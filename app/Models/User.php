@@ -57,7 +57,7 @@ class User extends Authenticatable implements JWTSubject
 
 	public function lessons()
 	{
-		return $this->belongsToMany(Lesson::class)->withPivot('status')->withTimestamps();
+		return $this->belongsToMany(Lesson::class)->withPivot('status', 'lives')->withTimestamps();
 	}
 
 	public function vocabularies()
