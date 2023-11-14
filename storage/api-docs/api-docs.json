@@ -153,6 +153,279 @@
                 ]
             }
         },
+        "/api/dashboard/dictionaries": {
+            "post": {
+                "tags": [
+                    "Dictionary"
+                ],
+                "summary": "Create new dictionary",
+                "operationId": "000f67012762d3f4ddcde4bb6377c1e5",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "dictionaries"
+                                ],
+                                "properties": {
+                                    "dictionaries": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "word",
+                                                "meaning",
+                                                "pronunciation"
+                                            ],
+                                            "properties": {
+                                                "word": {
+                                                    "description": "Word",
+                                                    "type": "string"
+                                                },
+                                                "pronunciation": {
+                                                    "description": "Pronunciation",
+                                                    "type": "string"
+                                                },
+                                                "meaning": {
+                                                    "description": "Meaning",
+                                                    "type": "string"
+                                                },
+                                                "example": {
+                                                    "description": "Example",
+                                                    "type": "string"
+                                                },
+                                                "exampple_meaning": {
+                                                    "description": "Example Meaning",
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Create dictionary success"
+                    },
+                    "500": {
+                        "description": "Server errror"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/dictionaries/{word}": {
+            "get": {
+                "tags": [
+                    "Dictionary"
+                ],
+                "summary": "Search a list of words",
+                "operationId": "6c8778d97c60a043e13c6d6fef4ce39b",
+                "parameters": [
+                    {
+                        "name": "word",
+                        "in": "path",
+                        "description": "Word",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of words",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "words": {
+                                            "title": "words",
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer"
+                                                    },
+                                                    "word": {
+                                                        "type": "string"
+                                                    },
+                                                    "pronunciation": {
+                                                        "type": "string"
+                                                    },
+                                                    "meaning": {
+                                                        "type": "string"
+                                                    },
+                                                    "image": {
+                                                        "type": "string",
+                                                        "nullable": true
+                                                    },
+                                                    "deleted_at": {
+                                                        "type": "string",
+                                                        "nullable": true
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string"
+                                                    },
+                                                    "dictionary": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "word_id": {
+                                                                "type": "integer"
+                                                            },
+                                                            "deleted_at": {
+                                                                "type": "string",
+                                                                "nullable": true
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string"
+                                                            },
+                                                            "updated_at": {
+                                                                "type": "string"
+                                                            },
+                                                            "example": {
+                                                                "type": "string"
+                                                            },
+                                                            "example_meaning": {
+                                                                "type": "string"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Word not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/dashboard/dictionaries/{id}": {
+            "put": {
+                "tags": [
+                    "Dictionary"
+                ],
+                "summary": "Edit dictionary",
+                "operationId": "ee8c8b896f1f717b0416f2f095c02c68",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "word",
+                                    "meaning",
+                                    "pronunciation"
+                                ],
+                                "properties": {
+                                    "word": {
+                                        "description": "Word",
+                                        "type": "string"
+                                    },
+                                    "pronunciation": {
+                                        "description": "Pronunciation",
+                                        "type": "string"
+                                    },
+                                    "meaning": {
+                                        "description": "Meaning",
+                                        "type": "string"
+                                    },
+                                    "example": {
+                                        "description": "Example",
+                                        "type": "string"
+                                    },
+                                    "example_meaning": {
+                                        "description": "Example Meaning",
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Edit dictionary success"
+                    },
+                    "500": {
+                        "description": "Server errror"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Dictionary"
+                ],
+                "description": "Delete dictionary",
+                "operationId": "706c46bf10d561fcb2073d6410271c21",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Delete dictionary success"
+                    },
+                    "404": {
+                        "description": "Dictionary not found"
+                    },
+                    "500": {
+                        "description": "Server error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/learn/{id}": {
             "post": {
                 "tags": [

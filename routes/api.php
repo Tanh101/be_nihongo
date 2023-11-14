@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DictionaryController;
 use App\Http\Controllers\LearningController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\TopicController;
@@ -71,6 +72,11 @@ Route::group([
 
     //vocabulary
     Route::post("vocabularies", [VocabularyController::class, "create_vocabularies_questions"]);
+
+    //dictonaries
+    Route::post("dictionaries", [DictionaryController::class, "createDictionary"]);
+    Route::put("dictionaries/{id}", [DictionaryController::class, "updateDictionary"]);
+    Route::delete("dictionaries/{id}", [DictionaryController::class, "deleteDictionary"]);
 });
 
 //Topics API
@@ -116,4 +122,15 @@ Route::group([
     ],
 ], function () {
     Route::patch("{id}", [LearningController::class, "checkAnswer"]);
+});
+
+//Dictionary API
+Route::group([
+    'prefix' => 'dictionaries',
+    'middleware' => [
+        'checkLogin',
+        'verifyToken'
+    ],
+], function () {
+    Route::get("{word}", [DictionaryController::class, "searchDictionaryByWord"]);
 });
