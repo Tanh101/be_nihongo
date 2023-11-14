@@ -5,9 +5,9 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Word>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
  */
-class WordFactory extends Factory
+class MeanFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -17,9 +17,10 @@ class WordFactory extends Factory
     public function definition(): array
     {
         return [
-            'word' => fake()->word(),
-            'pronunciation' => fake()->word(),
-            'sino_vietnamese' => fake()->word(),
+            'word_id' => fake()->numberBetween(1, 10),
+            'meaning' => fake()->word(),
+            'example' => fake()->sentence(),
+            'example_meaning' => fake()->sentence(),
             'image' => fake()->imageUrl(640, 480, 'people', true),
         ];
     }

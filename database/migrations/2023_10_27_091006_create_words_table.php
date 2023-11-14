@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('word');
             $table->string('pronunciation');
-            $table->string('meaning');
+            $table->string('sino_vietnamese')->nullable();
             $table->string('image')->nullable();
             $table->softDeletes();
             $table->timestamps();

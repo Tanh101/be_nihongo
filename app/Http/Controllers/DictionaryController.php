@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Dictionary;
 use App\Models\Word;
+use App\Repositories\Dictonary\DictionaryRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -11,6 +12,14 @@ use function PHPUnit\Framework\isEmpty;
 
 class DictionaryController extends Controller
 {
+    public $dictionaryRepository;
+
+    public function __construct(
+        DictionaryRepository $dictionaryRepository
+    ) {
+        $this->dictionaryRepository = $dictionaryRepository;
+    }
+
     /**
      * @OA\Post(
      *      path="/api/dashboard/dictionaries",
@@ -38,9 +47,23 @@ class DictionaryController extends Controller
      *                description="Pronunciation"
      *              ),
      *              @OA\Property(
-     *                property="meaning",
+     *                property="sino_vietnamese",
      *                type="string",
-     *                description="Meaning"
+     *                description="Sino Vietnamese"
+     *              ),
+     *              @OA\Property(
+     *                property="means",
+     *                type="array",
+     *                description="Means"
+     *                @OA\Items(
+     *                  type="object",
+     *                  required={"meaning", "example", "example_meaning"},
+     *                  @OA\Property(
+     *                      property="mean",
+     *                      type="string",
+     *                      description="Word"
+     *                  ),
+     *                ),
      *              ),
      *              @OA\Property(
      *                property="example",
@@ -75,11 +98,13 @@ class DictionaryController extends Controller
         $validator = Validator::make($request->all(), [
             'dictionaries' => 'required|array',
             'dictionaries.*.word' => 'required|string',
-            'dictionaries.*.meaning' => 'required|string',
             'dictionaries.*.pronunciation' => 'required|string',
-            'dictionaries.*.example' => 'string',
-            'dictionaries.*.example_meaning' => 'string',
-            'image' => 'string',
+            'dictionaries.*.sino_vietnamese' => 'string',
+            'dictionary.*.word.means' => 'required|array',
+            'dictionaries.*.word.means.*.meaning' => 'required|string',
+            'dictionaries.*.word.means.*.example' => 'string',
+            'dictionaries.*.word.means.*.example_meaning' => 'string',
+            'dictionaries.*.word.means.*.image' => 'string',
         ]);
 
         if ($validator->failed()) {
@@ -89,37 +114,7 @@ class DictionaryController extends Controller
             ], 400);
         }
 
-        $dictionaries = $request->input('dictionaries');
-        foreach ($dictionaries as $dictionary) {
-            $word = Word::create([
-                'word' => $dictionary['word'],
-                'meaning' => $dictionary['meaning'],
-                'pronunciation' => $dictionary['pronunciation'],
-                'image' => $dictionary['image'] ?? null,
-            ]);
-
-            if (!$word) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Failed to create word'
-                ], 500);
-            }
-
-            $newDictionary = Dictionary::create([
-                'word_id' => $word->id,
-                'example' => $dictionary['example'] ?? null,
-                'example_meaning' => $dictionary['example_meaning'] ?? null,
-            ]);
-
-            if (!$newDictionary) {
-                return response()->json([
-                    'status' => '',
-                    'message' => 'Failed to create dictionary'
-                ], 500);
-            }
-
-            array_push($dictionaryArray, $newDictionary);
-        }
+        $dictionaryArray = $this->dictionaryRepository->createDictionary($request->input('dictionaries'));
 
         return response()->json([
             'status' => 'success',
