@@ -71,7 +71,7 @@ Route::group([
     Route::get("topics/{id}", [TopicController::class, "get_topic"]);
 
     //vocabulary
-    Route::post("vocabularies", [VocabularyController::class, "create_vocabularies_questions"]);
+    Route::post("vocabularies/{id}", [VocabularyController::class, "create_vocabularies_questions"]);
 
     //dictonaries
     Route::post("dictionaries", [DictionaryController::class, "createDictionary"]);

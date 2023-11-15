@@ -23,12 +23,14 @@ class TopicController extends Controller
      *                 @OA\Property(
      *                     property="name",
      *                     type="string",
-     *                     description="Name"
+     *                     description="Name",
+     *                     example="Chương 1"
      *                 ),
      *                 @OA\Property(
      *                     property="description",
      *                     type="string",
-     *                     description="Description"
+     *                     description="Description",
+     *                     example="Giới thiệu về các từ vựng sơ cấp trong N5"
      *                 ),
      *                 @OA\Property(
      *                     property="image",
@@ -463,6 +465,7 @@ class TopicController extends Controller
                 $join->on('lessons.id', '=', 'lesson_user.lesson_id')
                     ->where('lesson_user.user_id', $userId);
             })
+            ->orderBy('topics.id')
             ->get();
 
         $topicsWithLessons = collect($result)->groupBy('topicId')->map(function ($items) {
