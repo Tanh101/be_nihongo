@@ -16,11 +16,6 @@ class Word extends Model
         return $this->belongsTo(Vocabulary::class);
     }
 
-    public function dictionary(): HasOne
-    {
-        return $this->hasOne(Dictionary::class);
-    }
-
     public function cards()
     {
         return $this->belongsTo(Card::class);

@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Mean extends Model
 {
     protected $fillable = [
+        'word_id',
         'meaning',
         'example',
         'example_meaning',

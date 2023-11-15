@@ -20,19 +20,23 @@
                                 "properties": {
                                     "name": {
                                         "description": "Name",
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "lyvantanh"
                                     },
                                     "email": {
                                         "description": "Email",
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "lyvantanh1@gmail.com"
                                     },
                                     "password": {
                                         "description": "Password",
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "12345678"
                                     },
                                     "password_confirmation": {
                                         "description": "Password confirmation",
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "12345678"
                                     }
                                 },
                                 "type": "object"
@@ -65,11 +69,13 @@
                                 "properties": {
                                     "email": {
                                         "description": "Email",
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "admin@gmail.com"
                                     },
                                     "password": {
                                         "description": "Password",
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "12345678"
                                     }
                                 },
                                 "type": "object"
@@ -174,29 +180,51 @@
                                         "items": {
                                             "required": [
                                                 "word",
-                                                "meaning",
-                                                "pronunciation"
+                                                "sino_vietnamese",
+                                                "pronunciation",
+                                                "means"
                                             ],
                                             "properties": {
                                                 "word": {
                                                     "description": "Word",
-                                                    "type": "string"
+                                                    "type": "string",
+                                                    "example": "突く"
                                                 },
                                                 "pronunciation": {
                                                     "description": "Pronunciation",
-                                                    "type": "string"
+                                                    "type": "string",
+                                                    "example": "つく"
                                                 },
-                                                "meaning": {
-                                                    "description": "Meaning",
-                                                    "type": "string"
+                                                "sino_vietnamese": {
+                                                    "description": "Sino Vietnamese",
+                                                    "type": "string",
+                                                    "example": "ĐỘT"
                                                 },
-                                                "example": {
-                                                    "description": "Example",
-                                                    "type": "string"
-                                                },
-                                                "exampple_meaning": {
-                                                    "description": "Example Meaning",
-                                                    "type": "string"
+                                                "means": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "required": [
+                                                            "meaning"
+                                                        ],
+                                                        "properties": {
+                                                            "meaning": {
+                                                                "description": "Meaning",
+                                                                "type": "string",
+                                                                "example": "đâm"
+                                                            },
+                                                            "example": {
+                                                                "description": "Example",
+                                                                "type": "string",
+                                                                "example": "ファークで肉を突く。"
+                                                            },
+                                                            "example_meaning": {
+                                                                "description": "Example Meaning",
+                                                                "type": "string",
+                                                                "example": "Dùng dao đâm vào thịt"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
                                                 }
                                             },
                                             "type": "object"
@@ -238,73 +266,97 @@
                         "name": "word",
                         "in": "path",
                         "description": "Word",
-                        "required": true
+                        "required": true,
+                        "example": "突"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "List of words",
+                        "description": "Successful operation",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
+                                        "status": {
+                                            "type": "string",
+                                            "example": "success"
+                                        },
                                         "words": {
-                                            "title": "words",
                                             "type": "array",
                                             "items": {
                                                 "properties": {
                                                     "id": {
-                                                        "type": "integer"
+                                                        "type": "integer",
+                                                        "example": 11
                                                     },
                                                     "word": {
-                                                        "type": "string"
+                                                        "type": "string",
+                                                        "example": "突く"
                                                     },
                                                     "pronunciation": {
-                                                        "type": "string"
-                                                    },
-                                                    "meaning": {
-                                                        "type": "string"
-                                                    },
-                                                    "image": {
                                                         "type": "string",
-                                                        "nullable": true
+                                                        "example": "つく"
+                                                    },
+                                                    "sino_vietnamese": {
+                                                        "type": "string",
+                                                        "example": "ĐỘT"
                                                     },
                                                     "deleted_at": {
                                                         "type": "string",
+                                                        "format": "date-time",
                                                         "nullable": true
                                                     },
                                                     "created_at": {
-                                                        "type": "string"
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2023-11-15T07:17:19.000000Z"
                                                     },
                                                     "updated_at": {
-                                                        "type": "string"
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "example": "2023-11-15T07:17:19.000000Z"
                                                     },
-                                                    "dictionary": {
-                                                        "properties": {
-                                                            "id": {
-                                                                "type": "integer"
+                                                    "means": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "properties": {
+                                                                "id": {
+                                                                    "type": "integer",
+                                                                    "example": 11
+                                                                },
+                                                                "word_id": {
+                                                                    "type": "integer",
+                                                                    "example": 11
+                                                                },
+                                                                "meaning": {
+                                                                    "type": "string",
+                                                                    "example": "đâm"
+                                                                },
+                                                                "example": {
+                                                                    "type": "string",
+                                                                    "example": "ファークで肉を突く。"
+                                                                },
+                                                                "example_meaning": {
+                                                                    "type": "string",
+                                                                    "example": "Dùng dao đâm vào thịt"
+                                                                },
+                                                                "image": {
+                                                                    "type": "string",
+                                                                    "nullable": true
+                                                                },
+                                                                "created_at": {
+                                                                    "type": "string",
+                                                                    "format": "date-time",
+                                                                    "example": "2023-11-15T07:17:19.000000Z"
+                                                                },
+                                                                "updated_at": {
+                                                                    "type": "string",
+                                                                    "format": "date-time",
+                                                                    "example": "2023-11-15T07:17:19.000000Z"
+                                                                }
                                                             },
-                                                            "word_id": {
-                                                                "type": "integer"
-                                                            },
-                                                            "deleted_at": {
-                                                                "type": "string",
-                                                                "nullable": true
-                                                            },
-                                                            "created_at": {
-                                                                "type": "string"
-                                                            },
-                                                            "updated_at": {
-                                                                "type": "string"
-                                                            },
-                                                            "example": {
-                                                                "type": "string"
-                                                            },
-                                                            "example_meaning": {
-                                                                "type": "string"
-                                                            }
-                                                        },
-                                                        "type": "object"
+                                                            "type": "object"
+                                                        }
                                                     }
                                                 },
                                                 "type": "object"
@@ -338,7 +390,8 @@
                     {
                         "name": "id",
                         "in": "path",
-                        "required": true
+                        "required": true,
+                        "example": 1
                     }
                 ],
                 "requestBody": {
@@ -348,29 +401,62 @@
                             "schema": {
                                 "required": [
                                     "word",
-                                    "meaning",
-                                    "pronunciation"
+                                    "means",
+                                    "pronunciation",
+                                    "sino_vietnamese"
                                 ],
                                 "properties": {
                                     "word": {
                                         "description": "Word",
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "解く"
                                     },
                                     "pronunciation": {
                                         "description": "Pronunciation",
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "ほどく"
                                     },
-                                    "meaning": {
-                                        "description": "Meaning",
-                                        "type": "string"
+                                    "sino_vietnamese": {
+                                        "description": "Sino Vietnamese",
+                                        "type": "string",
+                                        "example": "GIẢI"
                                     },
-                                    "example": {
-                                        "description": "Example",
-                                        "type": "string"
-                                    },
-                                    "example_meaning": {
-                                        "description": "Example Meaning",
-                                        "type": "string"
+                                    "means": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "id",
+                                                "meaning"
+                                            ],
+                                            "properties": {
+                                                "id": {
+                                                    "description": "Mean id",
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "meaning": {
+                                                    "description": "meaning",
+                                                    "type": "string",
+                                                    "example": "mở ra"
+                                                },
+                                                "example": {
+                                                    "description": "Example",
+                                                    "type": "string",
+                                                    "example": "靴の紐を解けた。"
+                                                },
+                                                "example_meaning": {
+                                                    "description": "Example Meaning",
+                                                    "type": "string",
+                                                    "example": "Mở dây giày"
+                                                },
+                                                "image": {
+                                                    "description": "Image",
+                                                    "type": "string",
+                                                    "example": "https://i.imgur.com/1.jpg"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
                                     }
                                 },
                                 "type": "object"
@@ -405,7 +491,8 @@
                     {
                         "name": "id",
                         "in": "path",
-                        "required": true
+                        "required": true,
+                        "example": 1
                     }
                 ],
                 "responses": {
@@ -413,7 +500,7 @@
                         "description": "Delete dictionary success"
                     },
                     "404": {
-                        "description": "Dictionary not found"
+                        "description": "Word not found"
                     },
                     "500": {
                         "description": "Server error"

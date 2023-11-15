@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Dictionary;
+use App\Models\Mean;
 use App\Models\Word;
-use App\Repositories\Dictonary\DictionaryRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -12,14 +12,6 @@ use function PHPUnit\Framework\isEmpty;
 
 class DictionaryController extends Controller
 {
-    public $dictionaryRepository;
-
-    public function __construct(
-        DictionaryRepository $dictionaryRepository
-    ) {
-        $this->dictionaryRepository = $dictionaryRepository;
-    }
-
     /**
      * @OA\Post(
      *      path="/api/dashboard/dictionaries",
@@ -35,44 +27,50 @@ class DictionaryController extends Controller
      *            type="array",
      *            @OA\Items(
      *              type="object",
-     *              required={"word", "meaning", "pronunciation"},
+     *              required={"word", "sino_vietnamese", "pronunciation", "means"},
      *              @OA\Property(
      *                property="word",
      *                type="string",
-     *                description="Word"
+     *                description="Word",
+     *                example="突く"
      *              ),
      *              @OA\Property(
      *                property="pronunciation",
      *                type="string",
-     *                description="Pronunciation"
+     *                description="Pronunciation",
+     *                example="つく"
      *              ),
      *              @OA\Property(
      *                property="sino_vietnamese",
      *                type="string",
-     *                description="Sino Vietnamese"
+     *                description="Sino Vietnamese",
+     *                example="ĐỘT"
      *              ),
      *              @OA\Property(
      *                property="means",
      *                type="array",
-     *                description="Means"
      *                @OA\Items(
      *                  type="object",
-     *                  required={"meaning", "example", "example_meaning"},
+     *                  required={"meaning"},
      *                  @OA\Property(
-     *                      property="mean",
+     *                      property="meaning",
      *                      type="string",
-     *                      description="Word"
+     *                      description="Meaning",
+     *                      example="đâm"
+     *                  ),
+     *                  @OA\Property(
+     *                      property="example",
+     *                      type="string",
+     *                      description="Example",
+     *                      example="ファークで肉を突く。"
+     *                  ),
+     *                  @OA\Property(
+     *                      property="example_meaning",
+     *                      type="string",
+     *                      description="Example Meaning",
+     *                      example="Dùng dao đâm vào thịt"
      *                  ),
      *                ),
-     *              ),
-     *              @OA\Property(
-     *                property="example",
-     *                type="string",
-     *                description="Example"
-     *              ),@OA\Property(
-     *                property="exampple_meaning",
-     *                type="string",
-     *                description="Example Meaning"
      *              ),
      *            ),
      *          ),
@@ -114,7 +112,35 @@ class DictionaryController extends Controller
             ], 400);
         }
 
-        $dictionaryArray = $this->dictionaryRepository->createDictionary($request->input('dictionaries'));
+        $dictionaries = $request->input('dictionaries');
+        foreach ($dictionaries as $dictionary) {
+            $newWord = Word::create([
+                'word' => $dictionary['word'],
+                'pronunciation' => $dictionary['pronunciation'],
+                'sino_vietnamese' => $dictionary['sino_vietnamese'] ?? null,
+                'image' => $dictionary['image'] ?? null,
+            ]);
+
+            if (!$newWord) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Failed to create word'
+                ], 500);
+            }
+
+            $means = $dictionary['means'];
+            foreach ($means as $mean) {
+                Mean::create([
+                    'meaning' => $mean['meaning'],
+                    'word_id' => $newWord->id,
+                    'example' => $mean['example'] ?? null,
+                    'example_meaning' => $mean['example_meaning'] ?? null,
+                    'image' => $mean['image'] ?? null,
+                ]);
+            }
+
+            array_push($dictionaryArray, $newWord->load('means'));
+        }
 
         return response()->json([
             'status' => 'success',
@@ -133,38 +159,40 @@ class DictionaryController extends Controller
      *       in="path",
      *       required=true,
      *       description="Word",
+     *       example="突"
      *     ),
      *     @OA\Response(
-     *         response="200",
-     *         description="List of words",
-     *         @OA\JsonContent(
-     *          @OA\Property(
-     *              property="words",
-     *              title="words",
-     *              type="array",
-     *              @OA\Items(
-     *                 @OA\Property(property="id", type="integer"),
-     *                 @OA\Property(property="word", type="string"),
-     *                 @OA\Property(property="pronunciation", type="string"),
-     *                 @OA\Property(property="meaning", type="string"),
-     *                 @OA\Property(property="image", type="string", nullable=true),
-     *                 @OA\Property(property="deleted_at", type="string", nullable=true),
-     *                 @OA\Property(property="created_at", type="string"),
-     *                 @OA\Property(property="updated_at", type="string"),
-     *                 @OA\Property(
-     *                     property="dictionary",
-     *                     type="object",
-     *                     @OA\Property(property="id", type="integer"),
-     *                     @OA\Property(property="word_id", type="integer"),
-     *                     @OA\Property(property="deleted_at", type="string", nullable=true),
-     *                     @OA\Property(property="created_at", type="string"),
-     *                     @OA\Property(property="updated_at", type="string"),
-     *                     @OA\Property(property="example", type="string"),
-     *                     @OA\Property(property="example_meaning", type="string"),
+     *      response="200",
+     *      description="Successful operation",
+     *      @OA\JsonContent(
+     *         type="object",
+     *         @OA\Property(property="status", type="string", example="success"),
+     *         @OA\Property(property="words", type="array",
+     *             @OA\Items(
+     *                 type="object",
+     *                 @OA\Property(property="id", type="integer", example=11),
+     *                 @OA\Property(property="word", type="string", example="突く"),
+     *                 @OA\Property(property="pronunciation", type="string", example="つく"),
+     *                 @OA\Property(property="sino_vietnamese", type="string", example="ĐỘT"),
+     *                 @OA\Property(property="deleted_at", type="string", format="date-time", nullable=true),
+     *                 @OA\Property(property="created_at", type="string", format="date-time", example="2023-11-15T07:17:19.000000Z"),
+     *                 @OA\Property(property="updated_at", type="string", format="date-time", example="2023-11-15T07:17:19.000000Z"),
+     *                 @OA\Property(property="means", type="array",
+     *                     @OA\Items(
+     *                         type="object",
+     *                         @OA\Property(property="id", type="integer", example=11),
+     *                         @OA\Property(property="word_id", type="integer", example=11),
+     *                         @OA\Property(property="meaning", type="string", example="đâm"),
+     *                         @OA\Property(property="example", type="string", example="ファークで肉を突く。"),
+     *                         @OA\Property(property="example_meaning", type="string", example="Dùng dao đâm vào thịt"),
+     *                         @OA\Property(property="image", type="string", nullable=true),
+     *                         @OA\Property(property="created_at", type="string", format="date-time", example="2023-11-15T07:17:19.000000Z"),
+     *                         @OA\Property(property="updated_at", type="string", format="date-time", example="2023-11-15T07:17:19.000000Z"),
+     *                     ),
      *                 ),
      *             ),
-     *           ),
      *         ),
+     *       ),
      *     ),
      *     @OA\Response(
      *       response="404",
@@ -174,8 +202,8 @@ class DictionaryController extends Controller
      */
     public function searchDictionaryByWord($word)
     {
-        $words = Word::where('word', 'like', '%' . $word . '%')->with('dictionary')->get();
-        if (isEmpty($words)) {
+        $words = Word::where('word', 'like', '%' . $word . '%')->with('means')->get();
+        if (!$words) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Word not found'
@@ -198,36 +226,69 @@ class DictionaryController extends Controller
      *          in="path",
      *          name="id",
      *          required=true,
+     *          example=1,
      *      ),
      *      @OA\RequestBody(
      *          required=true,
      *          @OA\JsonContent(
-     *              required={"word", "meaning", "pronunciation"},
+     *              required={"word", "means", "pronunciation", "sino_vietnamese"},
      *              @OA\Property(
      *                property="word",
      *                type="string",
-     *                description="Word"
+     *                description="Word",
+     *                example="解く"
      *              ),
      *              @OA\Property(
      *                property="pronunciation",
      *                type="string",
-     *                description="Pronunciation"
+     *                description="Pronunciation",
+     *                example="ほどく"
      *              ),
      *              @OA\Property(
-     *                property="meaning",
+     *                property="sino_vietnamese",
      *                type="string",
-     *                description="Meaning"
+     *                description="Sino Vietnamese",
+     *                example = "GIẢI"
      *              ),
      *              @OA\Property(
-     *                property="example",
-     *                type="string",
-     *                description="Example"
-     *              ),@OA\Property(
-     *                property="example_meaning",
-     *                type="string",
-     *                description="Example Meaning"
-     *              ),
+     *                property="means",
+     *                type="array",
+     *                @OA\Items(
+     *                type="object",
+     *                required={"id", "meaning"},
+     *                @OA\Property(
+     *                      property="id",
+     *                      type="integer",
+     *                      description="Mean id",
+     *                      example=2
+     *                ),
+     *                @OA\Property(
+     *                      property="meaning",
+     *                      type="string",
+     *                      description="meaning",
+     *                      example="mở ra"
+     *                ),
+     *                @OA\Property(
+     *                      property="example",
+     *                      type="string",
+     *                      description="Example",
+     *                      example="靴の紐を解けた。"
+     *                ),
+     *                @OA\Property(
+     *                      property="example_meaning",
+     *                      type="string",
+     *                      description="Example Meaning",
+     *                      example="Mở dây giày"
+     *                ),
+     *                @OA\Property(
+     *                      property="image",
+     *                      type="string",
+     *                      description="Image",
+     *                      example="https://i.imgur.com/1.jpg"
+     *                ),
+     *              )
      *            ),
+     *          ),
      *      ),
      *      @OA\Response(
      *          response=200,
@@ -247,11 +308,14 @@ class DictionaryController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'word' => 'string|required',
-            'meaning' => 'string|required',
-            'pronunciation' => 'string',
-            'example' => 'string|max:255',
-            'example_meaning' => 'string|max:255',
-            'image' => 'string',
+            'pronunciation' => 'string|required',
+            'sino_vietnamese' => 'string',
+            'means' => 'array|required',
+            'means.*.id' => 'required',
+            'means.*.meaning' => 'string|required',
+            'means.*.example' => 'string',
+            'means.*.example_meaning' => 'string',
+            'means.*.image' => 'string',
         ]);
         if ($validator->failed()) {
             return response()->json([
@@ -260,15 +324,7 @@ class DictionaryController extends Controller
             ], 400);
         }
 
-        $dictionary = Dictionary::find($id);
-        if (!$dictionary) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Dictionary not found'
-            ], 404);
-        }
-
-        $word = Word::find($dictionary->word_id);
+        $word = Word::find($id);
         if (!$word) {
             return response()->json([
                 'status' => 'error',
@@ -276,19 +332,31 @@ class DictionaryController extends Controller
             ], 404);
         }
 
-        $word->word = $request->input('word') ?? $word->word;
-        $word->meaning = $request->input('meaning') ?? $word->meaning;
-        $word->pronunciation = $request->input('pronunciation') ?? $word->pronunciation;
-        $word->image = $request->input('image') ?? $word->image;
+        $word->word = $request->input('word');
+        $word->pronunciation = $request->input('pronunciation');
+        $word->sino_vietnamese = $request->input('sino_vietnamese') ?? $word->sino_vietnamese;
         $word->save();
 
-        $dictionary->example = $request->input('example') ?? $dictionary->example;
-        $dictionary->example_meaning = $request->input('example_meaning') ?? $dictionary->example_meaning;
-        $dictionary->save();
+        $means = $request->input('means');
+        foreach ($means as $item) {
+            $mean = Mean::find($item['id']);
+            if (!$mean) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Mean not found'
+                ], 404);
+            }
+            $mean->meaning = $item['meaning'];
+            $mean->example = $item['example'] ?? $mean->example;
+            $mean->example_meaning = $item['example_meaning'] ?? $mean->example_meaning;
+            $mean->image = $item['image'] ?? $mean->image;
+            $mean->save();
+        }
 
         return response()->json([
             'status' => 'success',
-            'dictionary' => $dictionary->load('word')
+            'message' => 'Edit dictionary success',
+            'word' => $word->load('means')
         ], 200);
     }
 
@@ -302,6 +370,7 @@ class DictionaryController extends Controller
      *          in="path",
      *          name="id",
      *          required=true,
+     *          example=1,
      *      ),
      *      @OA\Response(
      *          response=200,
@@ -309,7 +378,7 @@ class DictionaryController extends Controller
      *       ),
      *      @OA\Response(
      *          response=404,
-     *          description="Dictionary not found",
+     *          description="Word not found",
      *       ),@OA\Response(
      *          response=500,
      *          description="Server error",
@@ -318,28 +387,19 @@ class DictionaryController extends Controller
      */
     public function deleteDictionary($id)
     {
-        $dictionary = Dictionary::find($id);
-        if (!$dictionary) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Dictionary not found'
-            ], 404);
-        }
-
-        $word = Word::find($dictionary->word_id);
+        $word = Word::find($id);
         if (!$word) {
             return response()->json([
-                'status' => 'error',
+                'status' => 'Error',
                 'message' => 'Word not found'
             ], 404);
         }
 
-        $dictionary->delete();
         $word->delete();
 
         return response()->json([
             'status' => 'success',
-            'message' => 'Delete dictionary success'
+            'message' => 'Delete dictionary successfully'
         ], 200);
     }
 }
