@@ -738,15 +738,18 @@
                                 "properties": {
                                     "title": {
                                         "description": "Title",
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "Lesson 1"
                                     },
                                     "topic_id": {
                                         "description": "Topic ID",
-                                        "type": "string"
+                                        "type": "integer",
+                                        "example": 1
                                     },
                                     "description": {
                                         "description": "Description",
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "Các từ vựng về gia đình"
                                     },
                                     "image": {
                                         "description": "Image",
@@ -794,7 +797,8 @@
                         "required": true,
                         "schema": {
                             "type": "integer"
-                        }
+                        },
+                        "example": 1
                     }
                 ],
                 "requestBody": {
@@ -852,7 +856,8 @@
                         "required": true,
                         "schema": {
                             "type": "integer"
-                        }
+                        },
+                        "example": 1
                     }
                 ],
                 "responses": {
@@ -916,12 +921,13 @@
                         "required": true,
                         "schema": {
                             "type": "integer"
-                        }
+                        },
+                        "example": 10
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Get lesson successfully",
+                        "description": "Successful response",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -932,32 +938,48 @@
                                         },
                                         "message": {
                                             "type": "string",
-                                            "example": "Get lesson successfully"
+                                            "example": "Get vocabularies successfully"
                                         },
                                         "lesson": {
                                             "properties": {
                                                 "id": {
                                                     "type": "integer",
-                                                    "example": 1
+                                                    "example": 10
                                                 },
                                                 "topic_id": {
-                                                    "type": "integer"
+                                                    "type": "integer",
+                                                    "example": 6
                                                 },
                                                 "title": {
                                                     "type": "string",
-                                                    "example": "Lesson 1"
+                                                    "example": "Repellat suscipit magnam laborum."
                                                 },
                                                 "description": {
-                                                    "type": "string"
+                                                    "type": "string",
+                                                    "example": "Distinctio omnis hic voluptatum eum in suscipit molestiae tempore accusantium commodi sed cum nihil quas eveniet possimus."
                                                 },
                                                 "image": {
-                                                    "type": "string"
+                                                    "type": "string",
+                                                    "example": "https://via.placeholder.com/640x480.png/005566?text=people+error"
                                                 },
                                                 "status": {
-                                                    "type": "string"
+                                                    "type": "string",
+                                                    "example": "active"
                                                 },
-                                                "timestamp": {
-                                                    "type": "string"
+                                                "deleted_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "nullable": true
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2023-11-15T06:54:04.000000Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2023-11-15T06:54:04.000000Z"
                                                 },
                                                 "vocabularies": {
                                                     "type": "array",
@@ -968,39 +990,89 @@
                                                                 "example": 1
                                                             },
                                                             "lesson_id": {
-                                                                "type": "integer"
+                                                                "type": "integer",
+                                                                "example": 10
                                                             },
                                                             "user_id": {
-                                                                "type": "integer"
+                                                                "type": "integer",
+                                                                "example": 1
                                                             },
                                                             "word_id": {
-                                                                "type": "integer"
+                                                                "type": "integer",
+                                                                "example": 11
                                                             },
                                                             "status": {
-                                                                "type": "string"
+                                                                "type": "string",
+                                                                "example": "active"
                                                             },
-                                                            "timestamp": {
-                                                                "type": "string"
+                                                            "deleted_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "nullable": true
+                                                            },
+                                                            "created_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2023-11-15T15:42:02.000000Z"
+                                                            },
+                                                            "updated_at": {
+                                                                "type": "string",
+                                                                "format": "date-time",
+                                                                "example": "2023-11-15T15:42:05.000000Z"
                                                             },
                                                             "word": {
                                                                 "properties": {
                                                                     "id": {
-                                                                        "type": "integer"
+                                                                        "type": "integer",
+                                                                        "example": 11
                                                                     },
                                                                     "word": {
-                                                                        "type": "string"
+                                                                        "type": "string",
+                                                                        "example": "突く"
                                                                     },
                                                                     "pronunciation": {
-                                                                        "type": "string"
+                                                                        "type": "string",
+                                                                        "example": "つく"
                                                                     },
-                                                                    "meaning": {
-                                                                        "type": "string"
+                                                                    "sino_vietnamese": {
+                                                                        "type": "string",
+                                                                        "example": "ĐỘT"
                                                                     },
                                                                     "image": {
-                                                                        "type": "string"
+                                                                        "type": "string",
+                                                                        "example": "https::/migroupvn.com"
                                                                     },
-                                                                    "timestamp": {
-                                                                        "type": "string"
+                                                                    "means": {
+                                                                        "type": "array",
+                                                                        "items": {
+                                                                            "properties": {
+                                                                                "id": {
+                                                                                    "type": "integer",
+                                                                                    "example": 1
+                                                                                },
+                                                                                "word_id": {
+                                                                                    "type": "integer",
+                                                                                    "example": 1
+                                                                                },
+                                                                                "meaning": {
+                                                                                    "type": "string",
+                                                                                    "example": "meaning 1"
+                                                                                },
+                                                                                "example": {
+                                                                                    "type": "string",
+                                                                                    "example": "example 1"
+                                                                                },
+                                                                                "example_meaning": {
+                                                                                    "type": "string",
+                                                                                    "example": "example maneing 1"
+                                                                                },
+                                                                                "status": {
+                                                                                    "type": "string",
+                                                                                    "example": "active"
+                                                                                }
+                                                                            },
+                                                                            "type": "object"
+                                                                        }
                                                                     }
                                                                 },
                                                                 "type": "object"
@@ -1010,49 +1082,24 @@
                                                                 "items": {
                                                                     "properties": {
                                                                         "id": {
-                                                                            "type": "integer"
+                                                                            "type": "integer",
+                                                                            "example": 1
                                                                         },
                                                                         "vocabulary_id": {
-                                                                            "type": "integer"
+                                                                            "type": "integer",
+                                                                            "example": 1
                                                                         },
                                                                         "content": {
-                                                                            "type": "string"
+                                                                            "type": "string",
+                                                                            "example": "question 1"
                                                                         },
                                                                         "meaning": {
-                                                                            "type": "string"
+                                                                            "type": "string",
+                                                                            "example": "meaning 1"
                                                                         },
                                                                         "status": {
-                                                                            "type": "string"
-                                                                        },
-                                                                        "timestamp": {
-                                                                            "type": "string"
-                                                                        },
-                                                                        "answers": {
-                                                                            "type": "array",
-                                                                            "items": {
-                                                                                "properties": {
-                                                                                    "id": {
-                                                                                        "type": "integer"
-                                                                                    },
-                                                                                    "question_id": {
-                                                                                        "type": "integer"
-                                                                                    },
-                                                                                    "content": {
-                                                                                        "type": "string"
-                                                                                    },
-                                                                                    "is_correct": {
-                                                                                        "type": "integer",
-                                                                                        "enum": [
-                                                                                            0,
-                                                                                            1
-                                                                                        ]
-                                                                                    },
-                                                                                    "timestamp": {
-                                                                                        "type": "string"
-                                                                                    }
-                                                                                },
-                                                                                "type": "object"
-                                                                            }
+                                                                            "type": "string",
+                                                                            "example": "active"
                                                                         }
                                                                     },
                                                                     "type": "object"
@@ -1157,11 +1204,13 @@
                                 "properties": {
                                     "name": {
                                         "description": "Name",
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "Chương 1"
                                     },
                                     "description": {
                                         "description": "Description",
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "Giới thiệu về các từ vựng sơ cấp trong N5"
                                     },
                                     "image": {
                                         "description": "Image",
@@ -1533,23 +1582,28 @@
                 ]
             }
         },
-        "/api/dashboard/vocabularies": {
+        "/api/dashboard/vocabularies/{id}": {
             "post": {
                 "tags": [
                     "Vocabylary and Question"
                 ],
                 "summary": "Create vocabularies and questions",
-                "operationId": "7bda04bc86c474391d2fbfc88e50b0c3",
+                "operationId": "4a002c46173a379e0b830f0eba164239",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Lesson ID",
+                        "required": true,
+                        "example": "1"
+                    }
+                ],
                 "requestBody": {
                     "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "properties": {
-                                    "lesson_id": {
-                                        "description": "Lesson ID",
-                                        "type": "string"
-                                    },
                                     "vocabularies": {
                                         "description": "Vocabularies",
                                         "type": "array",
@@ -1557,19 +1611,49 @@
                                             "properties": {
                                                 "word": {
                                                     "description": "Word",
-                                                    "type": "string"
-                                                },
-                                                "meaning": {
-                                                    "description": "Meaning",
-                                                    "type": "string"
+                                                    "type": "string",
+                                                    "example": "word 1"
                                                 },
                                                 "pronunciation": {
                                                     "description": "Pronunciation",
                                                     "type": "string"
                                                 },
+                                                "sino_vietnamese": {
+                                                    "description": "Sino-Vietnamese",
+                                                    "type": "string"
+                                                },
                                                 "image": {
                                                     "description": "Image",
                                                     "type": "string"
+                                                },
+                                                "means": {
+                                                    "description": "Means",
+                                                    "type": "array",
+                                                    "items": {
+                                                        "properties": {
+                                                            "meaning": {
+                                                                "description": "Meaning",
+                                                                "type": "string",
+                                                                "example": "meaning 1"
+                                                            },
+                                                            "example": {
+                                                                "description": "Example",
+                                                                "type": "string",
+                                                                "example": "example 1"
+                                                            },
+                                                            "example_meaning": {
+                                                                "description": "Example Meaning",
+                                                                "type": "string",
+                                                                "example": "Example Meaning 1"
+                                                            },
+                                                            "imgae": {
+                                                                "description": "Image",
+                                                                "type": "string",
+                                                                "example": "https::/dmeo.com/image.png"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
                                                 },
                                                 "questions": {
                                                     "description": "Questions",

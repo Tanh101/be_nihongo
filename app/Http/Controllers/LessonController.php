@@ -98,17 +98,20 @@ class LessonController extends Controller
      *                 @OA\Property(
      *                     property="title",
      *                     type="string",
-     *                     description="Title"
+     *                     description="Title",
+     *                     example="Lesson 1"
      *                 ),
      *                  @OA\Property(
      *                     property="topic_id",
-     *                     type="string",
-     *                     description="Topic ID"
+     *                     type="integer",
+     *                     description="Topic ID",
+     *                     example=1
      *                 ),
      *                 @OA\Property(
      *                     property="description",
      *                     type="string",
-     *                     description="Description"
+     *                     description="Description",
+     *                     example="Các từ vựng về gia đình"
      *                 ),
      *                 @OA\Property(
      *                     property="image",
@@ -179,6 +182,7 @@ class LessonController extends Controller
      *         name="id",
      *         in="path",
      *         description="ID",
+     *         example=1,
      *         required=true,
      *         @OA\Schema(
      *             type="integer"
@@ -262,6 +266,7 @@ class LessonController extends Controller
      *         in="path",
      *         description="ID",
      *         required=true,
+     *         example=1,
      *         @OA\Schema(
      *             type="integer"
      *         )
@@ -340,175 +345,71 @@ class LessonController extends Controller
      *         in="path",
      *         description="Lesson ID",
      *         required=true,
+     *         example=10,
      *         @OA\Schema(
      *             type="integer",
      *         )
      *     ),
      *     @OA\Response(
-     *         response="200",
-     *         description="Get lesson successfully",
-     *         @OA\JsonContent(
-     *             @OA\Property(
-     *                  property="success",
-     *                  type="boolean",
-     *                  example=true
-     *             ),
-     *             @OA\Property(
-     *                  property="message",
-     *                  type="string",
-     *                  example="Get lesson successfully"
-     *             ),
-     *             @OA\Property(
-     *                 property="lesson",
-     *                 type="object",
-     *                 @OA\Property(
-     *                      property="id",
-     *                      type="integer",
-     *                      example=1
-     *                 ),
-     *                 @OA\Property(
-     *                      property="topic_id",
-     *                      type="integer",
-     *                 ),
-     *                 @OA\Property(
-     *                      property="title",
-     *                      type="string",
-     *                      example="Lesson 1"
-     *                 ),
-     *                 @OA\Property(
-     *                      property="description",
-     *                      type="string",
-     *                 ),
-     *                 @OA\Property(
-     *                      property="image",
-     *                      type="string",
-     *                 ),
-     *                 @OA\Property(
-     *                      property="status",
-     *                      type="string",
-     *                 ),
-     *                 @OA\Property(
-     *                      property="timestamp",
-     *                      type="string",
-     *                 ),
-     *                 @OA\Property(
-     *                      property="vocabularies",
-     *                      type="array",
-     *                      @OA\Items(
-     *                          @OA\Property(
-     *                              property="id",
-     *                              type="integer",
-     *                              example=1
+     *     response="200",
+     *     description="Successful response",
+     *     @OA\JsonContent(
+     *         type="object",
+     *         @OA\Property(property="success", type="boolean", example=true),
+     *         @OA\Property(property="message", type="string", example="Get vocabularies successfully"),
+     *         @OA\Property(property="lesson", type="object",
+     *             @OA\Property(property="id", type="integer", example=10),
+     *             @OA\Property(property="topic_id", type="integer", example=6),
+     *             @OA\Property(property="title", type="string", example="Repellat suscipit magnam laborum."),
+     *             @OA\Property(property="description", type="string", example="Distinctio omnis hic voluptatum eum in suscipit molestiae tempore accusantium commodi sed cum nihil quas eveniet possimus."),
+     *             @OA\Property(property="image", type="string", example="https://via.placeholder.com/640x480.png/005566?text=people+error"),
+     *             @OA\Property(property="status", type="string", example="active"),
+     *             @OA\Property(property="deleted_at", type="string", format="date-time", nullable=true),
+     *             @OA\Property(property="created_at", type="string", format="date-time", example="2023-11-15T06:54:04.000000Z"),
+     *             @OA\Property(property="updated_at", type="string", format="date-time", example="2023-11-15T06:54:04.000000Z"),
+     *             @OA\Property(property="vocabularies", type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="id", type="integer", example=1),
+     *                     @OA\Property(property="lesson_id", type="integer", example=10),
+     *                     @OA\Property(property="user_id", type="integer", example=1),
+     *                     @OA\Property(property="word_id", type="integer", example=11),
+     *                     @OA\Property(property="status", type="string", example="active"),
+     *                     @OA\Property(property="deleted_at", type="string", format="date-time", nullable=true),
+     *                     @OA\Property(property="created_at", type="string", format="date-time", example="2023-11-15T15:42:02.000000Z"),
+     *                     @OA\Property(property="updated_at", type="string", format="date-time", example="2023-11-15T15:42:05.000000Z"),
+     *                     @OA\Property(property="word", type="object",
+     *                         @OA\Property(property="id", type="integer", example=11),
+     *                         @OA\Property(property="word", type="string", example="突く"),
+     *                         @OA\Property(property="pronunciation", type="string", example="つく"),
+     *                         @OA\Property(property="sino_vietnamese", type="string", example="ĐỘT"),
+     *                         @OA\Property(property="image", type="string", example="https::/migroupvn.com"),
+     *                         @OA\Property(property="means", type="array",
+        *                         @OA\Items(
+        *                             type="object",
+        *                             @OA\Property(property="id", type="integer", example=1),
+        *                             @OA\Property(property="word_id", type="integer", example=1),
+        *                             @OA\Property(property="meaning", type="string", example="meaning 1"),
+        *                             @OA\Property(property="example", type="string", example="example 1"),
+        *                             @OA\Property(property="example_meaning", type="string", example="example maneing 1"),
+        *                             @OA\Property(property="status", type="string", example="active"),
+        *                         ),
      *                          ),
-     *                          @OA\Property(
-     *                              property="lesson_id",
-     *                              type="integer",
-     *                          ),
-     *                          @OA\Property(
-     *                              property="user_id",
-     *                              type="integer",
-     *                          ),
-     *                          @OA\Property(
-     *                              property="word_id",
-     *                              type="integer",
-     *                          ),
-     *                          @OA\Property(
-     *                              property="status",
-     *                              type="string",
-     *                          ),
-     *                          @OA\Property(
-     *                              property="timestamp",
-     *                              type="string",
-     *                          ),
-     *                          @OA\Property(
-     *                              property="word",
-     *                              type="object",
-     *                              @OA\Property(
-     *                                  property="id",
-     *                                  type="integer",
-     *                              ),
-     *                              @OA\Property(
-     *                                  property="word",
-     *                                  type="string",
-     *                              ),
-     *                              @OA\Property(
-     *                                  property="pronunciation",
-     *                                  type="string",
-     *                              ),
-     *                              @OA\Property(
-     *                                  property="meaning",
-     *                                  type="string",
-     *                              ),
-     *                              @OA\Property(
-     *                                  property="image",
-     *                                  type="string",
-     *                              ),
-     *                              @OA\Property(
-     *                                  property="timestamp",
-     *                                  type="string",
-     *                              ),
-     *                           ),
-     *                           @OA\Property(
-     *                              property="questions",
-     *                              type="array",
-     *                              @OA\Items(
-     *                                  @OA\Property(
-     *                                      property="id",
-     *                                      type="integer",
-     *                                  ),
-     *                                  @OA\Property(
-     *                                      property="vocabulary_id",
-     *                                      type="integer",
-     *                                  ),
-     *                                  @OA\Property(
-     *                                      property="content",
-     *                                      type="string",
-     *                                  ),
-     *                                  @OA\Property(
-     *                                      property="meaning",
-     *                                      type="string",
-     *                                  ),
-     *                                  @OA\Property(
-     *                                      property="status",
-     *                                      type="string",
-     *                                  ),
-     *                                  @OA\Property(
-     *                                      property="timestamp",
-     *                                      type="string",
-     *                                  ),
-     *                                  @OA\Property(
-     *                                      property="answers",
-     *                                      type="array",
-     *                                      @OA\Items(
-     *                                          @OA\Property(
-     *                                              property="id",
-     *                                              type="integer",
-     *                                          ),
-     *                                          @OA\Property(
-     *                                              property="question_id",
-     *                                              type="integer",
-     *                                          ),
-     *                                          @OA\Property(
-     *                                              property="content",
-     *                                              type="string",
-     *                                          ),
-     *                                          @OA\Property(
-     *                                              property="is_correct",
-     *                                              type="integer",
-     *                                              enum={0, 1},
-     *                                          ),
-     *                                          @OA\Property(
-     *                                              property="timestamp",
-     *                                              type="string",
-     *                                          ),
-     *                                      ),
-     *                                  ),
-     *                              ),
-     *                          ),
-     *                      ),
+     *                     ),
+     *                     @OA\Property(property="questions", type="array",
+     *                         @OA\Items(
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer", example=1),
+     *                             @OA\Property(property="vocabulary_id", type="integer", example=1),
+     *                             @OA\Property(property="content", type="string", example="question 1"),
+     *                             @OA\Property(property="meaning", type="string", example="meaning 1"),
+     *                             @OA\Property(property="status", type="string", example="active"),
+     *                         ),
+     *                     ),
      *                 ),
      *             ),
-     *         ),
+     *          ),
+     *       ),
      *     ),
      *     @OA\Response(response="404", description="Lessons not found"),
      * )
