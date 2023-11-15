@@ -515,7 +515,7 @@ class LessonController extends Controller
      */
     public function getVocabulariesByLessonId(Request $request, $id)
     {
-        $result = Lesson::with('vocabularies.word', 'vocabularies.questions', 'vocabularies.questions.answers')
+        $result = Lesson::with('vocabularies.word', 'vocabularies.questions', 'vocabularies.word.means')
             ->find($id);
         if (!$result) {
             return response()->json([

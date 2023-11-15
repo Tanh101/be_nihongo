@@ -11,9 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('dictionaries', function (Blueprint $table) {
+        Schema::create('means', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('word_id');
+            $table->foreign('word_id')->references('id')->on('words')->onDelete('cascade');
+            $table->string('meaning');
             $table->string('example')->nullable();
             $table->string('example_meaning')->nullable();
+            $table->string('image')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -22,8 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('dictionnaries', function (Blueprint $table) {
-            $table->dropColumn('example');
-        });
+        Schema::dropIfExists('means');
     }
 };

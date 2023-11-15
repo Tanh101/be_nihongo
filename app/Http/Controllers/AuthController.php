@@ -21,22 +21,26 @@ class AuthController extends Controller
      *           @OA\Property(
      *               property="name",
      *               type="string",
-     *               description="Name"
+     *               description="Name",
+     *               example="lyvantanh"
      *           ),
      *           @OA\Property(
      *              property="email",
      *              type="string",
-     *              description="Email"
+     *              description="Email",
+     *              example="lyvantanh1@gmail.com"
      *          ),
      *          @OA\Property(
      *              property="password",
      *              type="string",
-     *              description="Password"
+     *              description="Password",
+     *              example="12345678"
      *          ),
      *          @OA\Property(
      *              property="password_confirmation",
      *              type="string",
-     *              description="Password confirmation"
+     *              description="Password confirmation",
+     *              example="12345678"
      *          )
      *       )
      *   ),
@@ -87,12 +91,14 @@ class AuthController extends Controller
      *           @OA\Property(
      *              property="email",
      *              type="string",
-     *              description="Email"
+     *              description="Email",
+     *              example="admin@gmail.com"
      *          ),
      *          @OA\Property(
      *              property="password",
      *              type="string",
-     *              description="Password"
+     *              description="Password",
+     *              example="12345678"
      *          )
      *       )
      *   ),
