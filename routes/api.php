@@ -128,10 +128,6 @@ Route::group([
 //Dictionary API
 Route::group([
     'prefix' => 'dictionaries',
-    'middleware' => [
-        'checkLogin',
-        'verifyToken'
-    ],
 ], function () {
     Route::get("", [DictionaryController::class, "searchDictionaryByWord"]);
 });
@@ -139,10 +135,6 @@ Route::group([
 //word API
 Route::group([
     'prefix' => 'words',
-    'middleware' => [
-        'checkLogin',
-        'verifyToken'
-    ],
 ], function () {
     Route::get("{word}", [WordController::class, "wordDetail"]);
 });

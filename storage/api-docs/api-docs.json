@@ -254,19 +254,18 @@
                 ]
             }
         },
-        "/api/dictionaries?word={word}": {
+        "/api/dictionaries": {
             "get": {
                 "tags": [
                     "Dictionary"
                 ],
                 "summary": "Search a list of words",
-                "operationId": "808a1e46ebb5d4cf357567d0b06411f5",
+                "operationId": "dba3be5c41636f58c36b4a3ffa3f7927",
                 "parameters": [
                     {
                         "name": "word",
                         "in": "query",
                         "description": "Word",
-                        "required": true,
                         "example": "突"
                     }
                 ],
