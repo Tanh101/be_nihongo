@@ -177,6 +177,14 @@ class VocabularyController extends Controller
         try {
             $vocabularies = $request->vocabularies;
             foreach ($vocabularies as $vocabulary) {
+                $word = Word::where('word', $vocabulary['word'])->first();
+                if ($word) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Word Already Exists',
+                    ], 400);
+                }
+                
                 $newWord = Word::create([
                     'word' => $vocabulary['word'],
                     'pronunciation' => $vocabulary['pronunciation'],

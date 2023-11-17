@@ -29,9 +29,9 @@ class WordController extends Controller
      *       ),
      *     )
      */
-    public function wordDetail($id)
+    public function wordDetail($word)
     {
-        $word = Word::with('means')->where('id', $id)->first();
+        $word = Word::with('means')->where('word', $word)->first();
         if (!$word) {
             return response()->json([
                 'message' => 'Word not found'
