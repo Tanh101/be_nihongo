@@ -151,13 +151,13 @@ class DictionaryController extends Controller
 
     /**
      * @OA\Get(
-     *     path="/api/dictionaries/{word}",
+     *     path="/api/dictionaries?word={word}",
      *     summary="Search a list of words",
      *     tags={"Dictionary"},
      *     security={{"bearerAuth":{}}},
      *     @OA\Parameter(
      *       name="word",
-     *       in="path",
+     *       in="query",
      *       required=true,
      *       description="Word",
      *       example="突"
@@ -201,8 +201,9 @@ class DictionaryController extends Controller
      *     ),
      * )
      */
-    public function searchDictionaryByWord($word)
+    public function searchDictionaryByWord(Request $request)
     {
+        $word = $request->query('word');
         $words = Word::where('word', 'like', '%' . $word . '%')->with('means')->get();
         foreach ($words as $word) {
             $resultWords[] = [
