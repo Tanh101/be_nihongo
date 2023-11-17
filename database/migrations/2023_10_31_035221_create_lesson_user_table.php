@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('lesson_id');
             $table->foreign('lesson_id')->references('id')->on('lessons')->onDelete('cascade');
             $table->unique(['user_id', 'lesson_id']);
-            $table->enum('status', ['learning', 'completed'])->default('learning');
+            $table->enum('status', ['locked', 'unloked', 'finished'])->default('locked');
             $table->timestamps();
         });
     }

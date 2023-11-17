@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('words', function (Blueprint $table) {
             $table->id();
-            $table->string('word');
+            $table->string('word')->unique();
             $table->string('pronunciation');
             $table->string('sino_vietnamese')->nullable();
             $table->string('image')->nullable();
