@@ -8,6 +8,7 @@ use App\Models\Word;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
+use function PHPSTORM_META\map;
 use function PHPUnit\Framework\isEmpty;
 
 class DictionaryController extends Controller
@@ -203,7 +204,16 @@ class DictionaryController extends Controller
     public function searchDictionaryByWord($word)
     {
         $words = Word::where('word', 'like', '%' . $word . '%')->with('means')->get();
-        if (!$words) {
+        foreach ($words as $word) {
+            $resultWords[] = [
+                'id' => $word->id,
+                'word' => $word->word,
+                'pronunciation' => $word->pronunciation,
+                'sino_vietnamese' => $word->sino_vietnamese,
+                'means' => $word->means->isNotEmpty() ? [$word->means->first()] : [],
+            ];
+        }
+        if (!$resultWords) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Word not found'
@@ -212,7 +222,7 @@ class DictionaryController extends Controller
 
         return response()->json([
             'status' => 'success',
-            'words' => $words
+            'words' => $resultWords
         ], 200);
     }
 

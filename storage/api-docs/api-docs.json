@@ -1720,6 +1720,36 @@
                     }
                 ]
             }
+        },
+        "/api/words/{word}": {
+            "get": {
+                "tags": [
+                    "Word"
+                ],
+                "description": "Get word detail",
+                "operationId": "a73bc04a663f4df3fd468b52f0510edc",
+                "parameters": [
+                    {
+                        "name": "word",
+                        "in": "path",
+                        "description": "Word",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get word detail successfully"
+                    },
+                    "404": {
+                        "description": "Word not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "components": {
