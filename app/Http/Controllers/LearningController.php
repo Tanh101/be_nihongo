@@ -47,6 +47,19 @@ class LearningController extends Controller
      */
     public function learnBylessonId(Request $request, $id)
     {
+        $user = Auth::user();
+
+        $previousLesson = Lesson::where('id', '<', $id)->orderBy('id', 'desc')->first();
+        return $user->lessons->contains($previousLesson);
+        if ($previousLesson) {
+            if ($user->lessons->contains($previousLesson) && $user->lessons->where('id', $previousLesson->id)->first()->pivot->status != 'finished') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You have not finished previous lesson'
+                ], 400);
+            }
+        }
+
         $lesson = Lesson::find($id);
         if (!$lesson) {
             return response()->json([
@@ -55,8 +68,7 @@ class LearningController extends Controller
             ], 404);
         }
 
-        $user = Auth::user();
-        $status = 'learning';
+        $status = 'unlocked';
         $lives = 3;
         if (!$user->lessons->contains($lesson)) {
             $user->lessons()->sync([$lesson->id => ['status' => $status, 'lives' => $lives]]);
@@ -66,7 +78,7 @@ class LearningController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'You are learning this lesson',
+            'message' => 'You have unlocked this lesson',
             'lesson' => $lesson
         ], 200);
     }
@@ -154,7 +166,9 @@ class LearningController extends Controller
                 'lives' => $lives
             ], 200);
         } else {
-            $lives -= 1;
+            if ($lives > 1) {
+                $lives -= 1;
+            }
             $user->lessons()->updateExistingPivot($id, ['lives' => $lives]);
             return response()->json([
                 'success' => true,
