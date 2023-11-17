@@ -133,7 +133,7 @@ Route::group([
         'verifyToken'
     ],
 ], function () {
-    Route::get("{word}", [DictionaryController::class, "searchDictionaryByWord"]);
+    Route::get("", [DictionaryController::class, "searchDictionaryByWord"]);
 });
 
 //word API
