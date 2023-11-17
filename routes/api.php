@@ -7,6 +7,7 @@ use App\Http\Controllers\LessonController;
 use App\Http\Controllers\TopicController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VocabularyController;
+use App\Http\Controllers\WordController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -133,4 +134,15 @@ Route::group([
     ],
 ], function () {
     Route::get("{word}", [DictionaryController::class, "searchDictionaryByWord"]);
+});
+
+//word API
+Route::group([
+    'prefix' => 'words',
+    'middleware' => [
+        'checkLogin',
+        'verifyToken'
+    ],
+], function () {
+    Route::get("{word}", [WordController::class, "wordDetail"]);
 });
