@@ -20,3 +20,5 @@ yarn-error.log
 storage/framework/cache/
 storage/framework/sessions/
 storage/framework/views/
+docker/mysql/
+docker/nginx_log/
