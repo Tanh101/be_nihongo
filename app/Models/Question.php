@@ -22,6 +22,7 @@ class Question extends Model
         'vocabulary_id',
         'content',
         'meaning',
+        'type',
         'status',
     ];
 

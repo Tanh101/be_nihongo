@@ -1593,8 +1593,7 @@
                         "name": "id",
                         "in": "path",
                         "description": "Lesson ID",
-                        "required": true,
-                        "example": "1"
+                        "required": true
                     }
                 ],
                 "requestBody": {
@@ -1610,8 +1609,7 @@
                                             "properties": {
                                                 "word": {
                                                     "description": "Word",
-                                                    "type": "string",
-                                                    "example": "word 1"
+                                                    "type": "string"
                                                 },
                                                 "pronunciation": {
                                                     "description": "Pronunciation",
@@ -1632,23 +1630,19 @@
                                                         "properties": {
                                                             "meaning": {
                                                                 "description": "Meaning",
-                                                                "type": "string",
-                                                                "example": "meaning 1"
+                                                                "type": "string"
                                                             },
                                                             "example": {
                                                                 "description": "Example",
-                                                                "type": "string",
-                                                                "example": "example 1"
+                                                                "type": "string"
                                                             },
                                                             "example_meaning": {
                                                                 "description": "Example Meaning",
-                                                                "type": "string",
-                                                                "example": "Example Meaning 1"
+                                                                "type": "string"
                                                             },
                                                             "imgae": {
                                                                 "description": "Image",
-                                                                "type": "string",
-                                                                "example": "https::/dmeo.com/image.png"
+                                                                "type": "string"
                                                             }
                                                         },
                                                         "type": "object"
@@ -1659,6 +1653,14 @@
                                                     "type": "array",
                                                     "items": {
                                                         "properties": {
+                                                            "type": {
+                                                                "description": "Type",
+                                                                "type": "enum",
+                                                                "enum": [
+                                                                    "writing",
+                                                                    "choice"
+                                                                ]
+                                                            },
                                                             "content": {
                                                                 "description": "Content",
                                                                 "type": "string"
@@ -1667,7 +1669,7 @@
                                                                 "description": "Meaning",
                                                                 "type": "string"
                                                             },
-                                                            "answer": {
+                                                            "answers": {
                                                                 "description": "Answer",
                                                                 "type": "array",
                                                                 "items": {
@@ -1681,11 +1683,7 @@
                                                                             "type": "integer"
                                                                         }
                                                                     },
-                                                                    "type": "object",
-                                                                    "example": {
-                                                                        "content": "answer 1",
-                                                                        "is_correct": 1
-                                                                    }
+                                                                    "type": "object"
                                                                 }
                                                             }
                                                         },
