@@ -25,7 +25,6 @@ class VocabularyController extends Controller
      *          in="path",
      *          name="id",
      *          required=true,
-     *          example="1",
      *      ),
      *     @OA\RequestBody(
      *        required=true,
@@ -39,7 +38,6 @@ class VocabularyController extends Controller
      *                          property="word",
      *                          type="string",
      *                          description="Word",
-     *                          example="word 1"
      *                      ),
      *                      @OA\Property(
      *                          property="pronunciation",
@@ -64,25 +62,21 @@ class VocabularyController extends Controller
      *                            @OA\Property(
      *                              property="meaning",
      *                              type="string",
-     *                              example="meaning 1",
      *                              description="Meaning"
      *                            ),
      *                            @OA\Property(
      *                              property="example",
      *                              type="string",
-     *                              example="example 1",
      *                              description="Example"
      *                            ),
      *                            @OA\Property(
      *                              property="example_meaning",
      *                              type="string",
-     *                              example="Example Meaning 1",
      *                              description="Example Meaning"
      *                            ),
      *                            @OA\Property(
      *                              property="imgae",
      *                              type="string",
-     *                              example="https::/dmeo.com/image.png",
      *                              description="Image"
      *                            ),
      *                            
@@ -94,6 +88,12 @@ class VocabularyController extends Controller
      *                          description="Questions",
      *                          @OA\Items(
      *                              @OA\Property(
+     *                                  property="type",
+     *                                  type="enum",
+     *                                  enum={"writing", "choice"},
+     *                                  description="Type"
+     *                              ),
+     *                              @OA\Property(
      *                                  property="content",
      *                                  type="string",
      *                                  description="Content"
@@ -104,7 +104,7 @@ class VocabularyController extends Controller
      *                                  description="Meaning"
      *                              ),
      *                              @OA\Property(
-     *                                  property="answer",  
+     *                                  property="answers",  
      *                                  type="array",
      *                                  description="Answer",
      *                                  @OA\Items(
@@ -118,10 +118,6 @@ class VocabularyController extends Controller
      *                                          type="integer",
      *                                          description="Is Correct"
      *                                      ),
-     *                                      example={
-     *                                          "content": "answer 1",
-     *                                          "is_correct": 1
-     *                                      }
      *                                  ),
      *                              ),
      *                          ),
@@ -149,11 +145,12 @@ class VocabularyController extends Controller
             'vocabularies.*.means.*.example_meaning' => 'string|max:255',
             'vocabularies.*.means.*.image' => 'nullable|string|max:255',
             'vocabularies.*.questions' => 'required|array',
+            'vocabularies.*.questions.*.type' => 'required|string|max:255',
             'vocabularies.*.questions.*.content' => 'required|string|max:255',
             'vocabularies.*.questions.*.meaning' => 'required|string|max:255',
             'vocabularies.*.questions.*.answers' => 'required|array',
             'vocabularies.*.questions.*.answer.*.content' => 'required|string|max:255',
-            'vocabularies.*.questions.*.answer.*.is_correct' => 'required|int|max:1',
+            'vocabularies.*.questions.*.answer.*.is_correct' => 'int|max:1',
         ]);
 
         if ($validator->fails()) {
@@ -184,7 +181,7 @@ class VocabularyController extends Controller
                         'message' => 'Word Already Exists',
                     ], 400);
                 }
-                
+
                 $newWord = Word::create([
                     'word' => $vocabulary['word'],
                     'pronunciation' => $vocabulary['pronunciation'],
@@ -232,8 +229,17 @@ class VocabularyController extends Controller
 
                 $questions = $vocabulary['questions'];
                 foreach ($questions as $question) {
+                    //check type question
+                    if($question['type'] != 'writing' && $question['type'] != 'choice') {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Question Creation Error - Type is not valid',
+                        ], 500);
+                    }
+
                     $newQuestion = Question::create([
                         'vocabulary_id' => $newVocabulary->id,
+                        'type' => $question['type'],
                         'content' => $question['content'],
                         'meaning' => $question['meaning'],
                     ]);
@@ -245,28 +251,62 @@ class VocabularyController extends Controller
                         ], 500);
                     }
 
+                    //check type question and create answer
                     $answers = $question['answers'];
-                    if (count($answers) < 4) {
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'Answer Creation Error',
-                        ], 500);
-                    }
-
-                    foreach ($answers as $answer) {
-                        $newAnswer = Answer::create([
+                    if ($newQuestion->type == 'writing') {
+                        $answer = Answer::create([
                             'question_id' => $newQuestion->id,
-                            'content' => $answer['content'],
-                            'is_correct' => $answer['is_correct'],
+                            'content' => $answers[0]['content'],
+                            'is_correct' => 1,
                         ]);
 
-                        if (!$newAnswer) {
+                        if (!$answer) {
                             return response()->json([
                                 'success' => false,
                                 'message' => 'Answer Creation Error',
                             ], 500);
                         }
+                    } else if ($newQuestion->type == 'choice') {
+                        $countCorrect = 0;
+
+                        if (count($answers) < 4) {
+                            return response()->json([
+                                'success' => false,
+                                'message' => 'Answer Creation Error',
+                            ], 500);
+                        }
+
+                        //check correct answer is only one
+                        foreach ($answers as $answer) {
+                            if($answer['is_correct'] == 1) {
+                                $countCorrect++;
+                            }
+                        }
+
+                        if($countCorrect != 1) {
+                            return response()->json([
+                                'success' => false,
+                                'message' => 'Answer Creation Error - Correct Answer is only one',
+                            ], 500);
+                        }
+
+                        foreach ($answers as $answer) {
+                            $newAnswer = Answer::create([
+                                'question_id' => $newQuestion->id,
+                                'content' => $answer['content'],
+                                'is_correct' => $answer['is_correct'],
+                            ]);
+    
+                            if (!$newAnswer) {
+                                return response()->json([
+                                    'success' => false,
+                                    'message' => 'Answer Creation Error',
+                                ], 500);
+                            }
+                        }
                     }
+
+                    
                 }
             }
 
