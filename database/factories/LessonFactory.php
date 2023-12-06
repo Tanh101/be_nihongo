@@ -18,7 +18,7 @@ class LessonFactory extends Factory
     {
         return [
             'title' => fake()->sentence(6),
-            'description' => fake()->sentence(20),
+            'description' => fake()->text(20),
             'image' => fake()->imageUrl(640, 480, 'people', true),
             'topic_id' => fake()->numberBetween(1, 10),
         ];

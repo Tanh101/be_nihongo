@@ -1,72 +1,24 @@
-version: "3.7"
-services: 
-
-  laravel:
-    build: 
-      context: ./
-      dockerfile: Dockerfile
-    container_name: docker_project
-    image: php:8.1-fpm
-    restart: unless-stopped
-    working_dir: /var/www/
-    volumes:
-      - ./laravel:/var/www
-    networks:
-      - dockerproject
-  nginx: 
-    image: nginx:alpine
-    container_name: docker_project_nginx
-    restart: unless-stopped
+miduner_server:
+    build: .
+    dockerfile: ./docker/Dockerfile
+    container_name: miduner_framework
+    working_dir: /var/www/html
     ports:
-      - "8080:80"
-      - "443:443"
+      - "80:80"
     volumes:
-      - ./laravel:/var/www
-      - ./nginx:/etc/nginx/conf.d/
-    networks:
-      - dockerproject
-  db:
-    image: mysql:8.0
-    container_name: docker_project_db
-    restart: unless-stopped
+        - .:/var/www/html
+        - ./docker/nginx_log:/var/log/nginx
+        - ./docker/php-fpm/php-fpm.log:/var/log/php-fpm.log
+        - ./docker/config/app.conf:/etc/nginx/conf.d/app.conf
+    links: 
+        - mysql
+
+mysql:
+    image: mysql:5.6
+    container_name: miduner_mysql
     ports:
       - "3306:3306"
-    environment:
-      MYSQL_DATABASE: laravel
-      MYSQL_ROOT_PASSWORD: lyvantanh2002
-      MYSQL_PASSWORD: lyvantanh2002
-      MYSQL_USER: admin
-      SERVICE_TAGS: dev 
-      SERVICE_NAME: mysql
     volumes:
-      - dbdata:/var/lib/mysql
-    networks:
-      - dockerproject
-  redis:
-    image: redis:4.0
-    container_name: docker_project_redis
-    restart: unless-stopped
-    ports:
-      - "6379:6379"
-    networks:
-      - dockerproject
-  minio:
-    image: minio/minio
-    container_name: docker_project_minio
-    restart: unless-stopped
-    ports:
-      - "9000:9000"
-      - "9001:9001"
-    volumes:
-      - ./minio_data:/data 
+      - ./docker/mysql:/var/lib/mysql
     environment:
-      MINIO_ROOT_USER: admin1234
-      MINIO_ROOT_PASSWORD: admin1234
-    command: server --console-address ":9001" /data
-    networks:
-      - dockerproject
-networks:
-  dockerproject:
-    driver: bridge
-volumes:
-  dbdata:
+      MYSQL_ROOT_PASSWORD: lyvantanh2002  
