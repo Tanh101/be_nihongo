@@ -96,22 +96,23 @@ class DictionaryController extends Controller
         $dictionaryArray = [];
         $validator = Validator::make($request->all(), [
             'dictionaries' => 'required|array',
-            'dictionaries.*.word' => 'required|string',
+            'dictionaries.*.word' => 'required|string|unique:words',
             'dictionaries.*.pronunciation' => 'required|string',
             'dictionaries.*.sino_vietnamese' => 'string',
-            'dictionary.*.word.means' => 'required|array',
-            'dictionaries.*.word.means.*.meaning' => 'required|string',
-            'dictionaries.*.word.means.*.example' => 'string',
-            'dictionaries.*.word.means.*.example_meaning' => 'string',
-            'dictionaries.*.word.means.*.image' => 'string',
+            'dictionaries.*.means' => 'required|array',
+            'dictionaries.*.means.*.meaning' => 'required|string',
+            'dictionaries.*.means.*.example' => 'string',
+            'dictionaries.*.means.*.example_meaning' => 'string',
+            'dictionaries.*.means.*.image' => 'string',
         ]);
-
-        if ($validator->failed()) {
+        
+        if ($validator->fails()) {
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()
             ], 400);
         }
+        
 
         $dictionaries = $request->input('dictionaries');
         foreach ($dictionaries as $dictionary) {
@@ -202,6 +203,7 @@ class DictionaryController extends Controller
      */
     public function searchDictionaryByWord(Request $request)
     {
+        $resultWords = [];
         $word = $request->query('word');
         if (!$word)
             $words = Word::with('means')->limit(5)->get();
