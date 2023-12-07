@@ -50,7 +50,6 @@ class LearningController extends Controller
         $user = Auth::user();
 
         $previousLesson = Lesson::where('id', '<', $id)->orderBy('id', 'desc')->first();
-        return $user->lessons->contains($previousLesson);
         if ($previousLesson) {
             if ($user->lessons->contains($previousLesson) && $user->lessons->where('id', $previousLesson->id)->first()->pivot->status != 'finished') {
                 return response()->json([
