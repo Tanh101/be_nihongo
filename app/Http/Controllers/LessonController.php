@@ -385,15 +385,15 @@ class LessonController extends Controller
      *                         @OA\Property(property="sino_vietnamese", type="string", example="ĐỘT"),
      *                         @OA\Property(property="image", type="string", example="https::/migroupvn.com"),
      *                         @OA\Property(property="means", type="array",
-        *                         @OA\Items(
-        *                             type="object",
-        *                             @OA\Property(property="id", type="integer", example=1),
-        *                             @OA\Property(property="word_id", type="integer", example=1),
-        *                             @OA\Property(property="meaning", type="string", example="meaning 1"),
-        *                             @OA\Property(property="example", type="string", example="example 1"),
-        *                             @OA\Property(property="example_meaning", type="string", example="example maneing 1"),
-        *                             @OA\Property(property="status", type="string", example="active"),
-        *                         ),
+     *                         @OA\Items(
+     *                             type="object",
+     *                             @OA\Property(property="id", type="integer", example=1),
+     *                             @OA\Property(property="word_id", type="integer", example=1),
+     *                             @OA\Property(property="meaning", type="string", example="meaning 1"),
+     *                             @OA\Property(property="example", type="string", example="example 1"),
+     *                             @OA\Property(property="example_meaning", type="string", example="example maneing 1"),
+     *                             @OA\Property(property="status", type="string", example="active"),
+     *                         ),
      *                          ),
      *                     ),
      *                     @OA\Property(property="questions", type="array",
@@ -416,8 +416,16 @@ class LessonController extends Controller
      */
     public function getVocabulariesByLessonId(Request $request, $id)
     {
-        $result = Lesson::with('vocabularies.word', 'vocabularies.questions', 'vocabularies.word.means')
-            ->find($id);
+        $result = Lesson::with([
+            'vocabularies.word',
+            'vocabularies.questions' => function ($query) {
+                $query->where('type', 'choice')->with('answers:id,question_id,content')
+                      ->orWhere('type', 'writing');
+            },
+            'vocabularies.word.means',
+        ])->find($id);
+        
+
         if (!$result) {
             return response()->json([
                 'success' => false,
