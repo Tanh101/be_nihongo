@@ -17,7 +17,7 @@ class WordFactory extends Factory
     public function definition(): array
     {
         return [
-            'word' => fake()->word(),
+            'word' => fake()->unique()->word(),
             'pronunciation' => fake()->word(),
             'sino_vietnamese' => fake()->word(),
             'image' => fake()->imageUrl(640, 480, 'people', true),

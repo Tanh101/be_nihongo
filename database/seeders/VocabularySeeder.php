@@ -13,6 +13,6 @@ class VocabularySeeder extends Seeder
      */
     public function run(): void
     {
-        Vocabulary::factory()->count(10)->create();
+        Vocabulary::factory()->count(50)->create();
     }
 }
