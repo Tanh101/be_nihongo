@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Topic;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,11 +17,12 @@ class LessonFactory extends Factory
      */
     public function definition(): array
     {
+        $topics = Topic::all()->pluck('id')->toArray();
         return [
             'title' => fake()->sentence(6),
             'description' => fake()->text(20),
             'image' => fake()->imageUrl(640, 480, 'people', true),
-            'topic_id' => fake()->numberBetween(1, 10),
+            'topic_id' => fake()->randomElement($topics),
         ];
     }
 }

@@ -20,7 +20,10 @@ class DatabaseSeeder extends Seeder
             LessonSeeder::class,
             WordSeeder::class,
             MeaningSeeder::class,
-            // VocabularySeeder::class,
+            UserSeeder::class,
+            VocabularySeeder::class,
+            QuestionSeeder::class,
+            // AnswerSeeder::class,
         ]);
     }
 }

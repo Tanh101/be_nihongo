@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Word;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,8 +17,9 @@ class MeanFactory extends Factory
      */
     public function definition(): array
     {
+        $words = Word::all()->pluck('id')->toArray();
         return [
-            'word_id' => fake()->numberBetween(1, 10),
+            'word_id' => fake()->randomElement($words),
             'meaning' => fake()->word(),
             'example' => fake()->sentence(),
             'example_meaning' => fake()->sentence(),

@@ -2,18 +2,17 @@
 
 namespace Database\Seeders;
 
-use App\Models\Mean;
-use Database\Factories\MeanFactory;
+use App\Models\Answer;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
-class MeaningSeeder extends Seeder
+class AnswerSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        Mean::factory()->count(50)->create();
+        Answer::factory()->count(60)->create();
     }
 }
