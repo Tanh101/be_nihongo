@@ -467,25 +467,30 @@ class TopicController extends Controller
             })
             ->orderBy('topics.id')
             ->get();
-
-        $topicsWithLessons = collect($result)->groupBy('topicId')->map(function ($items) {
+        $topicsWithLessons = collect($result)->groupBy('topicId')->map(function ($items, $key) {
             $firstItem = $items->first();
+
             return [
                 'topicId' => $firstItem->topicId,
                 'topicName' => $firstItem->topicName,
                 'topicImage' => $firstItem->topicImage,
-                'lessons' => $items->map(function ($item) {
-                    return [
-                        'lessonId' => $item->lessonId,
-                        'lessonTitle' => $item->lessonTitle,
-                        'lessonDescription' => $item->lessonDescription,
-                        'lessonImage' => $item->lessonImage,
-                        'status' => $item->status,
-                    ];
+                'lessons' => $items->map(function ($item, $key2) use ($key) {
+                    $status = ($key === 1 && $key2 === 0) ? 'unlocked' : ($item->status ?? 'locked');
+
+                    if ($item->lessonId !== null) {
+                        return [
+                            'lessonId' => $item->lessonId,
+                            'lessonTitle' => $item->lessonTitle,
+                            'lessonDescription' => $item->lessonDescription,
+                            'lessonImage' => $item->lessonImage,
+                            'status' => $status,
+                        ];
+                    }
                 })->all(),
             ];
         })->values()->all();
-        
+
+
         if ($topicsWithLessons) {
             return response()->json([
                 'suscess' => 'true',
