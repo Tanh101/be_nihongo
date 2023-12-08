@@ -49,13 +49,52 @@ class LearningController extends Controller
     {
         $user = Auth::user();
 
-        $previousLesson = Lesson::where('id', '<', $id)->orderBy('id', 'desc')->first();
-        if ($previousLesson) {
-            if ($user->lessons->contains($previousLesson) && $user->lessons->where('id', $previousLesson->id)->first()->pivot->status != 'finished') {
+        $lesson = Lesson::where('id', $id)->get()->first();
+
+        if (!$lesson) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lesson not found'
+            ], 404);
+        }
+
+        $lessonsInTopic = Lesson::where('topic_id', $lesson->topic_id)->get();
+        if (!$lessonsInTopic) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lesson not found'
+            ], 404);
+        }
+
+        $firstLesson = $lessonsInTopic[0];
+        $previousLessonId = -1;
+
+        for ($i = 0; $i < count($lessonsInTopic); $i++) {
+            if ($lessonsInTopic[$i]->id == $lesson->id) {
+                if ($i > 0) {
+                    $previousLessonId = $lessonsInTopic[$i - 1]->id;
+                }
+                break;
+            }
+        }
+        if ($previousLessonId == -1) {
+            $previousLessonId = $firstLesson->id;
+        }
+        $previousLesson = Lesson::where('id', $previousLessonId)->get()->first();
+
+        if ($previousLesson && $previousLesson->id != $lesson->id) {
+            if (!$user->lessons->contains($previousLesson)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'You have not finished previous lesson'
+                    'message' => 'You have not finished previous lesson',
                 ], 400);
+
+                if ($user->lessons->where('id', $previousLesson->id)->first()->pivot->status != 'finished') {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'You have not finished previous lesson'
+                    ], 400);
+                }
             }
         }
 
