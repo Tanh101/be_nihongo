@@ -465,6 +465,7 @@ class TopicController extends Controller
                 $join->on('lessons.id', '=', 'lesson_user.lesson_id')
                     ->where('lesson_user.user_id', $userId);
             })
+            ->whereNull('lessons.deleted_at')
             ->orderBy('topics.id')
             ->get();
         $topicsWithLessons = collect($result)->groupBy('topicId')->map(function ($items, $key) {

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Lesson;
 use App\Models\Question;
+use App\Models\Topic;
 use App\Models\Vocabulary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -50,75 +51,48 @@ class LearningController extends Controller
     {
         $user = Auth::user();
 
-        $lesson = Lesson::where('id', $id)->get()->first();
+        $lessonWithId = Lesson::where('id', $id)->get()->first();
 
-        if (!$lesson) {
+        if (!$lessonWithId) {
             return response()->json([
                 'success' => false,
                 'message' => 'Lesson not found'
             ], 404);
         }
-
-        $lessonsInTopic = Lesson::where('topic_id', $lesson->topic_id)->get();
-        if (!$lessonsInTopic) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Lesson not found'
-            ], 404);
-        }
-
-        $firstLesson = $lessonsInTopic[0];
-        $previousLessonId = -1;
-
-        for ($i = 0; $i < count($lessonsInTopic); $i++) {
-            if ($lessonsInTopic[$i]->id == $lesson->id) {
-                if ($i > 0) {
-                    $previousLessonId = $lessonsInTopic[$i - 1]->id;
+        $firstTopic = Topic::orderBy('id', 'asc')->first();
+        if ($lessonWithId->topic_id == $firstTopic->id) {
+            $firstLesson = Lesson::where('topic_id', $firstTopic->id)->orderBy('id', 'asc')->first();
+            if ($firstLesson->id == $lessonWithId->id) {
+                // $user->lessons()->sync([$lessonWithId->id => ['status' => 'unlocked', 'lives' => 3]]);
+                if (!$user->lessons()->wherePivot('lesson_id', $lessonWithId->id)->wherePivot('user_id', $user->id)) {
+                    $user->lessons()->attach($lessonWithId->id, ['status' => 'unlocked', 'lives' => 3]);
+                } else {
+                    $user->lessons()->updateExistingPivot($lessonWithId->id, ['status' => 'unlocked', 'lives' => 3]);
                 }
-                break;
-            }
-        }
-        if ($previousLessonId == -1) {
-            $previousLessonId = $firstLesson->id;
-        }
-        $previousLesson = Lesson::where('id', $previousLessonId)->get()->first();
-
-        if ($previousLesson && $previousLesson->id != $lesson->id) {
-            if (!$user->lessons->contains($previousLesson)) {
                 return response()->json([
-                    'success' => false,
-                    'message' => 'You have not finished previous lesson',
-                ], 400);
-
-                if ($user->lessons->where('id', $previousLesson->id)->first()->pivot->status != 'finished') {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'You have not finished previous lesson'
-                    ], 400);
-                }
+                    'success' => true,
+                    'message' => 'You have unlocked this lesson',
+                    'lesson' => $lessonWithId
+                ], 200);
             }
         }
-
-        $lesson = Lesson::find($id);
-        if (!$lesson) {
+        if (!$user->lessons->contains($lessonWithId)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Lesson not found'
-            ], 404);
+                'message' => 'You have not finished previous lesson',
+            ], 400);
         }
 
-        $status = 'unlocked';
-        $lives = 3;
-        if (!$user->lessons->contains($lesson)) {
-            $user->lessons()->sync([$lesson->id => ['status' => $status, 'lives' => $lives]]);
+        if (!$user->lessons()->wherePivot('lesson_id', $lessonWithId->id)->wherePivot('user_id', $user->id)) {
+            $user->lessons()->attach($lessonWithId->id, ['status' => 'unlocked', 'lives' => 3]);
         } else {
-            $user->lessons()->updateExistingPivot($lesson->id, ['status' => $status, 'lives' => $lives]);
+            $user->lessons()->updateExistingPivot($lessonWithId->id, ['status' => 'unlocked', 'lives' => 3]);
         }
 
         return response()->json([
             'success' => true,
             'message' => 'You have unlocked this lesson',
-            'lesson' => $lesson
+            'lesson' => $lessonWithId
         ], 200);
     }
 
@@ -196,8 +170,8 @@ class LearningController extends Controller
         $correct_answer = $question->answers->where('is_correct', 1)->first();
 
         //check if question is final question ---- missing ------------------
-        $questionsInLesson = Vocabulary::with('questions')->where('lesson_id', $id)->first()->questions;
-        $lastQuestion = $questionsInLesson[count($questionsInLesson) - 1];
+        $lastVocabulary = Vocabulary::where('lesson_id', $id)->orderBy('id', 'desc')->first();
+        $lastQuestion = Question::where('vocabulary_id', $lastVocabulary->id)->orderBy('id', 'desc')->first();
 
         $isFinalQuestion = false;
         if ($question->id == $lastQuestion->id) {
@@ -209,6 +183,31 @@ class LearningController extends Controller
             if ($request->answer === (string)$correct_answer->id) {
                 if ($isFinalQuestion) {
                     $user->lessons()->updateExistingPivot($id, ['status' => 'finished']);
+
+                    //unlocked next lesson
+                    $lastLessonInTopic = $this->findLastLessonByTopicId($lesson->topic_id);
+                    if ($lastLessonInTopic->id != $lesson->id) {
+                        $nextLesson = Lesson::where('topic_id', $lesson->topic_id)->where('id', '>', $lesson->id)->first();
+                        if ($nextLesson) {
+                            if ($user->lessons()->wherePivot('lesson_id', $nextLesson->id)->wherePivot('user_id', $user->id)) {
+                                $user->lessons()->attach($nextLesson->id, ['status' => 'unlocked', 'lives' => 3]);
+                            } else {
+                                $user->lessons()->updateExistingPivot($nextLesson->id, ['status' => 'unlocked', 'lives' => 3]);
+                            }
+                        }
+                    } else {
+                        $nextTopic = Topic::where('id', '>', $lesson->topic_id)->first();
+                        if ($nextTopic) {
+                            $nextLesson = Lesson::where('topic_id', $nextTopic->id)->first();
+                            if ($nextLesson) {
+                                if ($user->lessons()->wherePivot('lesson_id', $nextLesson->id)->wherePivot('user_id', $user->id)) {
+                                    $user->lessons()->attach($nextLesson->id, ['status' => 'unlocked', 'lives' => 3]);
+                                } else {
+                                    $user->lessons()->updateExistingPivot($nextLesson->id, ['status' => 'unlocked', 'lives' => 3]);
+                                }
+                            }
+                        }
+                    }
                 }
                 return response()->json([
                     'success' => true,
@@ -232,6 +231,29 @@ class LearningController extends Controller
             if ($request->answer === $correct_answer->content) {
                 if ($isFinalQuestion) {
                     $user->lessons()->updateExistingPivot($id, ['status' => 'finished']);
+
+                    //unlocked next lesson
+                    $lastLessonInTopic = $this->findLastLessonByTopicId($lesson->topic_id);
+                    if ($lastLessonInTopic->id != $lesson->id) {
+                        $nextLesson = Lesson::where('topic_id', $lesson->topic_id)->where('id', '>', $lesson->id)->first();
+                        if ($user->lessons()->wherePivot('lesson_id', $nextLesson->id)->wherePivot('user_id', $user->id)) {
+                            $user->lessons()->attach($nextLesson->id, ['status' => 'unlocked', 'lives' => 3]);
+                        } else {
+                            $user->lessons()->updateExistingPivot($nextLesson->id, ['status' => 'unlocked', 'lives' => 3]);
+                        }
+                    } else {
+                        $nextTopic = Topic::where('id', '>', $lesson->topic_id)->first();
+                        if ($nextTopic) {
+                            $nextLesson = Lesson::where('topic_id', $nextTopic->id)->first();
+                            if ($nextLesson) {
+                                if ($user->lessons()->wherePivot('lesson_id', $nextLesson->id)->wherePivot('user_id', $user->id)) {
+                                    $user->lessons()->attach($nextLesson->id, ['status' => 'unlocked', 'lives' => 3]);
+                                } else {
+                                    $user->lessons()->updateExistingPivot($nextLesson->id, ['status' => 'unlocked', 'lives' => 3]);
+                                }
+                            }
+                        }
+                    }
                 }
                 return response()->json([
                     'success' => true,
@@ -243,7 +265,11 @@ class LearningController extends Controller
                 if ($lives >= 1) {
                     $lives -= 1;
                 }
-                $user->lessons()->updateExistingPivot($id, ['lives' => $lives]);
+                if ($user->lessons()->wherePivot('lesson_id', $lesson->id)->wherePivot('user_id', $user->id)) {
+                    $user->lessons()->attach($lesson->id, ['lives' => $lives]);
+                } else {
+                    $user->lessons()->updateExistingPivot($lesson->id, ['lives' => $lives]);
+                }
                 return response()->json([
                     'success' => true,
                     'message' => 'Wrong answer',
@@ -252,5 +278,11 @@ class LearningController extends Controller
                 ], 200);
             }
         }
+    }
+
+    public function findLastLessonByTopicId($id)
+    {
+        $lesson = Lesson::where('topic_id', $id)->orderBy('id', 'desc')->first();
+        return $lesson;
     }
 }
