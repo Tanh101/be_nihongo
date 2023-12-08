@@ -615,7 +615,7 @@
                                 ],
                                 "properties": {
                                     "question_id": {
-                                        "type": "integer",
+                                        "type": "string",
                                         "example": 1
                                     },
                                     "answer": {

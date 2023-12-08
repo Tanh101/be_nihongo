@@ -467,6 +467,7 @@ class TopicController extends Controller
             })
             ->whereNull('lessons.deleted_at')
             ->orderBy('topics.id')
+            ->orderBy('lessons.id')
             ->get();
         $topicsWithLessons = collect($result)->groupBy('topicId')->map(function ($items, $key) {
             $firstItem = $items->first();
