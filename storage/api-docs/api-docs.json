@@ -619,8 +619,8 @@
                                         "example": 1
                                     },
                                     "answer": {
-                                        "type": "string",
-                                        "example": "answer"
+                                        "type": "integer",
+                                        "example": "1"
                                     }
                                 },
                                 "type": "object"

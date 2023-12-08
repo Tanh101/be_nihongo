@@ -230,7 +230,7 @@ class VocabularyController extends Controller
                 $questions = $vocabulary['questions'];
                 foreach ($questions as $question) {
                     //check type question
-                    if($question['type'] != 'writing' && $question['type'] != 'choice') {
+                    if ($question['type'] != 'writing' && $question['type'] != 'choice') {
                         return response()->json([
                             'success' => false,
                             'message' => 'Question Creation Error - Type is not valid',
@@ -278,12 +278,12 @@ class VocabularyController extends Controller
 
                         //check correct answer is only one
                         foreach ($answers as $answer) {
-                            if($answer['is_correct'] == 1) {
+                            if ($answer['is_correct'] == 1) {
                                 $countCorrect++;
                             }
                         }
 
-                        if($countCorrect != 1) {
+                        if ($countCorrect != 1) {
                             return response()->json([
                                 'success' => false,
                                 'message' => 'Answer Creation Error - Correct Answer is only one',
@@ -296,7 +296,7 @@ class VocabularyController extends Controller
                                 'content' => $answer['content'],
                                 'is_correct' => $answer['is_correct'],
                             ]);
-    
+
                             if (!$newAnswer) {
                                 return response()->json([
                                     'success' => false,
@@ -305,8 +305,6 @@ class VocabularyController extends Controller
                             }
                         }
                     }
-
-                    
                 }
             }
 
