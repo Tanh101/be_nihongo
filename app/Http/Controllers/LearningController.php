@@ -112,7 +112,7 @@ class LearningController extends Controller
      *          required=true,
      *          @OA\JsonContent(
      *              required={"question_id", "answer"},
-     *              @OA\Property(property="question_id", type="integer", example=1),
+     *              @OA\Property(property="question_id", type="string", example=1),
      *              @OA\Property(property="answer", type="string", example="1"),
      *          ),
      *      ),
@@ -138,9 +138,10 @@ class LearningController extends Controller
     public function checkAnswer(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'question_id' => 'required|integer',
+            'question_id' => 'required|string',
             'answer' => 'required|string',
         ]);
+
 
         if ($validator->fails()) {
             return response()->json([
@@ -149,8 +150,8 @@ class LearningController extends Controller
                 'errors' => $validator->errors()
             ], 400);
         }
-
-        $question = Question::find($request->question_id);
+        $quesId = (int) $request->question_id;
+        $question = Question::find($quesId);
         if (!$question) {
             return response()->json([
                 'success' => false,
