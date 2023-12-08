@@ -64,7 +64,7 @@ class LearningController extends Controller
             $firstLesson = Lesson::where('topic_id', $firstTopic->id)->orderBy('id', 'asc')->first();
             if ($firstLesson->id == $lessonWithId->id) {
                 // $user->lessons()->sync([$lessonWithId->id => ['status' => 'unlocked', 'lives' => 3]]);
-                if (!$user->lessons()->wherePivot('lesson_id', $lessonWithId->id)->wherePivot('user_id', $user->id)) {
+                if (count($user->lessons()->wherePivot('lesson_id', $lessonWithId->id)->wherePivot('user_id', $user->id)->get()) == 0) {
                     $user->lessons()->attach($lessonWithId->id, ['status' => 'unlocked', 'lives' => 3]);
                 } else {
                     $user->lessons()->updateExistingPivot($lessonWithId->id, ['status' => 'unlocked', 'lives' => 3]);
@@ -83,7 +83,7 @@ class LearningController extends Controller
             ], 400);
         }
 
-        if (!$user->lessons()->wherePivot('lesson_id', $lessonWithId->id)->wherePivot('user_id', $user->id)) {
+        if (count($user->lessons()->wherePivot('lesson_id', $lessonWithId->id)->wherePivot('user_id', $user->id)->get()) == 0) {
             $user->lessons()->attach($lessonWithId->id, ['status' => 'unlocked', 'lives' => 3]);
         } else {
             $user->lessons()->updateExistingPivot($lessonWithId->id, ['status' => 'unlocked', 'lives' => 3]);
@@ -177,19 +177,27 @@ class LearningController extends Controller
         if ($question->id == $lastQuestion->id) {
             $isFinalQuestion = true;
         }
+        if (count($user->lessons()->wherePivot('lesson_id', $lesson->id)->wherePivot('user_id', $user->id)->get()) == 0) {
+            $lives = $user->lessons()->wherePivot('lesson_id', $lesson->id)->wherePivot('user_id', $user->id)->first()->pivot->lives;
+        } else {
+            $lives = 3;
+        }
 
-        $lives = $user->lessons->where('id', $id)->first()->pivot->lives;
         if ($question->type == 'choice') {
             if ($request->answer === (string)$correct_answer->id) {
                 if ($isFinalQuestion) {
-                    $user->lessons()->updateExistingPivot($id, ['status' => 'finished']);
+                    if (count($user->lessons()->wherePivot('lesson_id', $lesson->id)->wherePivot('user_id', $user->id)->get()) == 0) {
+                        $user->lessons()->attach($lesson->id, ['status' => 'finished', 'lives' => 3]);
+                    } else {
+                        $user->lessons()->updateExistingPivot($lesson->id, ['status' => 'finished', 'lives' => 3]);
+                    }
 
                     //unlocked next lesson
                     $lastLessonInTopic = $this->findLastLessonByTopicId($lesson->topic_id);
                     if ($lastLessonInTopic->id != $lesson->id) {
                         $nextLesson = Lesson::where('topic_id', $lesson->topic_id)->where('id', '>', $lesson->id)->first();
                         if ($nextLesson) {
-                            if ($user->lessons()->wherePivot('lesson_id', $nextLesson->id)->wherePivot('user_id', $user->id)) {
+                            if (count($user->lessons()->wherePivot('lesson_id', $nextLesson->id)->wherePivot('user_id', $user->id)->get()) == 0) {
                                 $user->lessons()->attach($nextLesson->id, ['status' => 'unlocked', 'lives' => 3]);
                             } else {
                                 $user->lessons()->updateExistingPivot($nextLesson->id, ['status' => 'unlocked', 'lives' => 3]);
@@ -200,7 +208,7 @@ class LearningController extends Controller
                         if ($nextTopic) {
                             $nextLesson = Lesson::where('topic_id', $nextTopic->id)->first();
                             if ($nextLesson) {
-                                if ($user->lessons()->wherePivot('lesson_id', $nextLesson->id)->wherePivot('user_id', $user->id)) {
+                                if (count($user->lessons()->wherePivot('lesson_id', $nextLesson->id)->wherePivot('user_id', $user->id)->get()) == 0) {
                                     $user->lessons()->attach($nextLesson->id, ['status' => 'unlocked', 'lives' => 3]);
                                 } else {
                                     $user->lessons()->updateExistingPivot($nextLesson->id, ['status' => 'unlocked', 'lives' => 3]);
@@ -219,7 +227,11 @@ class LearningController extends Controller
                 if ($lives >= 1) {
                     $lives -= 1;
                 }
-                $user->lessons()->updateExistingPivot($id, ['lives' => $lives]);
+                if (count($user->lessons()->wherePivot('lesson_id', $lesson->id)->wherePivot('user_id', $user->id)->get()) == 0) {
+                    $user->lessons()->attach($lesson->id, ['lives' => $lives]);
+                } else {
+                    $user->lessons()->updateExistingPivot($lesson->id, ['lives' => $lives]);
+                }
                 return response()->json([
                     'success' => true,
                     'message' => 'Wrong answer',
@@ -230,13 +242,17 @@ class LearningController extends Controller
         } else {
             if ($request->answer === $correct_answer->content) {
                 if ($isFinalQuestion) {
-                    $user->lessons()->updateExistingPivot($id, ['status' => 'finished']);
+                    if (count($user->lessons()->wherePivot('lesson_id', $lesson->id)->wherePivot('user_id', $user->id)->get()) == 0) {
+                        $user->lessons()->attach($lesson->id, ['status' => 'finished', 'lives' => 3]);
+                    } else {
+                        $user->lessons()->updateExistingPivot($lesson->id, ['status' => 'finished', 'lives' => 3]);
+                    }
 
                     //unlocked next lesson
                     $lastLessonInTopic = $this->findLastLessonByTopicId($lesson->topic_id);
                     if ($lastLessonInTopic->id != $lesson->id) {
                         $nextLesson = Lesson::where('topic_id', $lesson->topic_id)->where('id', '>', $lesson->id)->first();
-                        if ($user->lessons()->wherePivot('lesson_id', $nextLesson->id)->wherePivot('user_id', $user->id)) {
+                        if (count($user->lessons()->wherePivot('lesson_id', $nextLesson->id)->wherePivot('user_id', $user->id)->get()) == 0) {
                             $user->lessons()->attach($nextLesson->id, ['status' => 'unlocked', 'lives' => 3]);
                         } else {
                             $user->lessons()->updateExistingPivot($nextLesson->id, ['status' => 'unlocked', 'lives' => 3]);
@@ -246,7 +262,7 @@ class LearningController extends Controller
                         if ($nextTopic) {
                             $nextLesson = Lesson::where('topic_id', $nextTopic->id)->first();
                             if ($nextLesson) {
-                                if ($user->lessons()->wherePivot('lesson_id', $nextLesson->id)->wherePivot('user_id', $user->id)) {
+                                if (count($user->lessons()->wherePivot('lesson_id', $nextLesson->id)->wherePivot('user_id', $user->id)->get()) == 0) {
                                     $user->lessons()->attach($nextLesson->id, ['status' => 'unlocked', 'lives' => 3]);
                                 } else {
                                     $user->lessons()->updateExistingPivot($nextLesson->id, ['status' => 'unlocked', 'lives' => 3]);
@@ -265,7 +281,7 @@ class LearningController extends Controller
                 if ($lives >= 1) {
                     $lives -= 1;
                 }
-                if ($user->lessons()->wherePivot('lesson_id', $lesson->id)->wherePivot('user_id', $user->id)) {
+                if (count($user->lessons()->wherePivot('lesson_id', $lesson->id)->wherePivot('user_id', $user->id)->get()) == 0) {
                     $user->lessons()->attach($lesson->id, ['lives' => $lives]);
                 } else {
                     $user->lessons()->updateExistingPivot($lesson->id, ['lives' => $lives]);
