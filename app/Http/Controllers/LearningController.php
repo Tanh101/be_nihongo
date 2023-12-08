@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Lesson;
 use App\Models\Question;
+use App\Models\Vocabulary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -138,7 +139,7 @@ class LearningController extends Controller
      *          @OA\JsonContent(
      *              required={"question_id", "answer"},
      *              @OA\Property(property="question_id", type="integer", example=1),
-     *              @OA\Property(property="answer", type="string", example="answer"),
+     *              @OA\Property(property="answer", type="integer", example="1"),
      *          ),
      *      ),
      *      @OA\Response(
@@ -164,7 +165,7 @@ class LearningController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'question_id' => 'required|integer',
-            'answer' => 'required|string',
+            'answer' => 'required|integer',
         ]);
 
         if ($validator->fails()) {
@@ -192,28 +193,64 @@ class LearningController extends Controller
         }
 
         $user = Auth::user();
-        $correct_answer = $question->answers->where('is_correct', 1)->first()->content;
+        $correct_answer = $question->answers->where('is_correct', 1)->first();
 
         //check if question is final question ---- missing ------------------
+        $questionsInLesson = Vocabulary::with('questions')->where('lesson_id', $id)->first()->questions;
+        $lastQuestion = $questionsInLesson[count($questionsInLesson) - 1];
+
+        $isFinalQuestion = false;
+        if ($question->id == $lastQuestion->id) {
+            $isFinalQuestion = true;
+        }
+
         $lives = $user->lessons->where('id', $id)->first()->pivot->lives;
-        if ($request->answer === $correct_answer) {
-            return response()->json([
-                'success' => true,
-                'message' => 'Correct answer',
-                'correct_answer' => $correct_answer,
-                'lives' => $lives
-            ], 200);
-        } else {
-            if ($lives > 1) {
-                $lives -= 1;
+        if ($question->type == 'choice') {
+            if ($request->answer === $correct_answer->id) {
+                if ($isFinalQuestion) {
+                    $user->lessons()->updateExistingPivot($id, ['status' => 'finished']);
+                }
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Correct answer',
+                    'correct_answer' => $correct_answer,
+                    'lives' => $lives
+                ], 200);
+            } else {
+                if ($lives >= 1) {
+                    $lives -= 1;
+                }
+                $user->lessons()->updateExistingPivot($id, ['lives' => $lives]);
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Wrong answer',
+                    'correct_answer' => $correct_answer,
+                    'lives' => $lives
+                ], 200);
             }
-            $user->lessons()->updateExistingPivot($id, ['lives' => $lives]);
-            return response()->json([
-                'success' => true,
-                'message' => 'Wrong answer',
-                'correct_answer' => $correct_answer,
-                'lives' => $lives
-            ], 200);
+        } else {
+            if ($request->answer === $correct_answer->content) {
+                if ($isFinalQuestion) {
+                    $user->lessons()->updateExistingPivot($id, ['status' => 'finished']);
+                }
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Correct answer',
+                    'correct_answer' => $correct_answer,
+                    'lives' => $lives
+                ], 200);
+            } else {
+                if ($lives >= 1) {
+                    $lives -= 1;
+                }
+                $user->lessons()->updateExistingPivot($id, ['lives' => $lives]);
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Wrong answer',
+                    'correct_answer' => $correct_answer,
+                    'lives' => $lives
+                ], 200);
+            }
         }
     }
 }
