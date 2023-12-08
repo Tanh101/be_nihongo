@@ -139,7 +139,7 @@ class LearningController extends Controller
      *          @OA\JsonContent(
      *              required={"question_id", "answer"},
      *              @OA\Property(property="question_id", type="integer", example=1),
-     *              @OA\Property(property="answer", type="integer", example="1"),
+     *              @OA\Property(property="answer", type="string", example="1"),
      *          ),
      *      ),
      *      @OA\Response(
@@ -165,7 +165,7 @@ class LearningController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'question_id' => 'required|integer',
-            'answer' => 'required|integer',
+            'answer' => 'required|string',
         ]);
 
         if ($validator->fails()) {
@@ -206,7 +206,7 @@ class LearningController extends Controller
 
         $lives = $user->lessons->where('id', $id)->first()->pivot->lives;
         if ($question->type == 'choice') {
-            if ($request->answer === $correct_answer->id) {
+            if ($request->answer === (string)$correct_answer->id) {
                 if ($isFinalQuestion) {
                     $user->lessons()->updateExistingPivot($id, ['status' => 'finished']);
                 }

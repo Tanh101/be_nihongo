@@ -425,11 +425,6 @@ class LessonController extends Controller
             'vocabularies.word.means',
         ])->find($id);
 
-        $result->vocabularies->each(function ($vocabulary) {
-            $vocabulary->questions = $vocabulary->questions->sortBy('id');
-        });
-        
-
         if (!$result) {
             return response()->json([
                 'success' => false,
