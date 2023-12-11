@@ -34,53 +34,10 @@ class VocabularyController extends Controller
      *                  type="array",
      *                  description="Vocabularies",
      *                  @OA\Items(
-     *                      @OA\Property(
+     *                     @OA\Property(
      *                          property="word",
      *                          type="string",
-     *                          description="Word",
-     *                      ),
-     *                      @OA\Property(
-     *                          property="pronunciation",
-     *                          type="string",
-     *                          description="Pronunciation"
-     *                      ),
-     *                      @OA\Property(
-     *                          property="sino_vietnamese",
-     *                          type="string",
-     *                          description="Sino-Vietnamese"
-     *                      ),
-     *                      @OA\Property(
-     *                          property="image",
-     *                          type="string",
-     *                          description="Image"
-     *                      ),
-     *                      @OA\Property(
-     *                          property="means",
-     *                          type="array",
-     *                          description="Means",
-     *                          @OA\Items(
-     *                            @OA\Property(
-     *                              property="meaning",
-     *                              type="string",
-     *                              description="Meaning"
-     *                            ),
-     *                            @OA\Property(
-     *                              property="example",
-     *                              type="string",
-     *                              description="Example"
-     *                            ),
-     *                            @OA\Property(
-     *                              property="example_meaning",
-     *                              type="string",
-     *                              description="Example Meaning"
-     *                            ),
-     *                            @OA\Property(
-     *                              property="imgae",
-     *                              type="string",
-     *                              description="Image"
-     *                            ),
-     *                            
-     *                          )
+     *                          description="Word"
      *                      ),
      *                      @OA\Property(
      *                          property="questions",
@@ -136,14 +93,6 @@ class VocabularyController extends Controller
         $validator = Validator::make($request->all(), [
             'vocabularies' => 'required|array',
             'vocabularies.*.word' => 'required|string|max:255',
-            'vocabularies.*.pronunciation' => 'required|string|max:255',
-            'vocabularies.*.sino_vietnamese' => 'string|max:255',
-            'vocabularies.*.image' => 'nullable|string|max:255',
-            'vocabularies.*.means' => 'required|array',
-            'vocabularies.*.means.*.meaning' => 'required|string',
-            'vocabularies.*.means.*.example' => 'string|max:255',
-            'vocabularies.*.means.*.example_meaning' => 'string|max:255',
-            'vocabularies.*.means.*.image' => 'nullable|string|max:255',
             'vocabularies.*.questions' => 'required|array',
             'vocabularies.*.questions.*.type' => 'required|string|max:255',
             'vocabularies.*.questions.*.content' => 'required|string|max:255',
@@ -175,49 +124,17 @@ class VocabularyController extends Controller
             $vocabularies = $request->vocabularies;
             foreach ($vocabularies as $vocabulary) {
                 $word = Word::where('word', $vocabulary['word'])->first();
-                if ($word) {
+                if (!$word) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Word Already Exists',
+                        'message' => 'Word not found',
                     ], 400);
-                }
-
-                $newWord = Word::create([
-                    'word' => $vocabulary['word'],
-                    'pronunciation' => $vocabulary['pronunciation'],
-                    'sino_vietnamese' => $vocabulary['sino_vietnamese'],
-                    'image' => $vocabulary['image'] ?? null,
-                ]);
-
-                if (!$newWord) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Word Creation Error',
-                    ], 500);
-                }
-
-                $means = $vocabulary['means'];
-                foreach ($means as $mean) {
-                    $newMean = Mean::create([
-                        'word_id' => $newWord->id,
-                        'meaning' => $mean['meaning'],
-                        'example' => $mean['example'],
-                        'example_meaning' => $mean['example_meaning'],
-                        'image' => $mean['image'] ?? null,
-                    ]);
-
-                    if (!$newMean) {
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'Mean Creation Error',
-                        ], 500);
-                    }
                 }
 
                 $newVocabulary = Vocabulary::create([
                     'user_id' => auth()->user()->id,
                     'lesson_id' => $id,
-                    'word_id' => $newWord->id,
+                    'word_id' => $word->id,
                 ]);
 
                 if (!$newVocabulary) {
