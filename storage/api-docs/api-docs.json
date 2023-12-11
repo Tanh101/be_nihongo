@@ -1611,43 +1611,6 @@
                                                     "description": "Word",
                                                     "type": "string"
                                                 },
-                                                "pronunciation": {
-                                                    "description": "Pronunciation",
-                                                    "type": "string"
-                                                },
-                                                "sino_vietnamese": {
-                                                    "description": "Sino-Vietnamese",
-                                                    "type": "string"
-                                                },
-                                                "image": {
-                                                    "description": "Image",
-                                                    "type": "string"
-                                                },
-                                                "means": {
-                                                    "description": "Means",
-                                                    "type": "array",
-                                                    "items": {
-                                                        "properties": {
-                                                            "meaning": {
-                                                                "description": "Meaning",
-                                                                "type": "string"
-                                                            },
-                                                            "example": {
-                                                                "description": "Example",
-                                                                "type": "string"
-                                                            },
-                                                            "example_meaning": {
-                                                                "description": "Example Meaning",
-                                                                "type": "string"
-                                                            },
-                                                            "imgae": {
-                                                                "description": "Image",
-                                                                "type": "string"
-                                                            }
-                                                        },
-                                                        "type": "object"
-                                                    }
-                                                },
                                                 "questions": {
                                                     "description": "Questions",
                                                     "type": "array",
