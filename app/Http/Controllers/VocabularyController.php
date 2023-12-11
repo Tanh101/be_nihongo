@@ -122,26 +122,24 @@ class VocabularyController extends Controller
 
         try {
             $vocabularies = $request->vocabularies;
+
             foreach ($vocabularies as $vocabulary) {
                 $word = Word::where('word', $vocabulary['word'])->first();
                 if (!$word) {
                     return response()->json([
                         'success' => false,
                         'message' => 'Word not found',
-                    ], 400);
+                    ], 404);
                 }
 
-                $newVocabulary = Vocabulary::create([
-                    'user_id' => auth()->user()->id,
-                    'lesson_id' => $id,
-                    'word_id' => $word->id,
-                ]);
+                $vocabularyInDB = Vocabulary::where('word_id', $word->id)->first();
 
-                if (!$newVocabulary) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Vocabulary Creation Error',
-                    ], 500);
+                if (!$vocabularyInDB) {
+                    $vocabularyInDB = Vocabulary::create([
+                        'user_id' => auth()->user()->id,
+                        'word_id' => $word->id,
+                        'lesson_id' => $id,
+                    ]);
                 }
 
                 $questions = $vocabulary['questions'];
@@ -153,13 +151,15 @@ class VocabularyController extends Controller
                             'message' => 'Question Creation Error - Type is not valid',
                         ], 500);
                     }
-
+                    
                     $newQuestion = Question::create([
-                        'vocabulary_id' => $newVocabulary->id,
+                        'vocabulary_id' => $vocabularyInDB->id,
                         'type' => $question['type'],
                         'content' => $question['content'],
                         'meaning' => $question['meaning'],
                     ]);
+                    
+
 
                     if (!$newQuestion) {
                         return response()->json([
