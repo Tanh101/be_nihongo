@@ -85,6 +85,8 @@ Nếu có docker thì truy cập vào OS của container bằng câu lệnh sau:
 
 Sau đó thực thi dòng này
 
+Re
+
 `mysql -u root -p your_db_name < your_sql_file `
 
 Ex: ` mysql -u root -p laravel < data.sql `
