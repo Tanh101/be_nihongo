@@ -64,3 +64,27 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## RUN DOCKER 
+Build docker container with php nginx from Dockerfile
+
+` docker build ./docker `
+
+Pull and start containers by docker compose and run with desktop flag
+
+` docker compose up -d `
+
+Stop container by docker compose
+
+` docker compose down `
+
+## IMPORT DATA from SQL file
+Nếu có docker thì truy cập vào OS của container bằng câu lệnh sau: 
+
+` docker-compose exec miduner_server bash `
+
+Sau đó thực thi dòng này
+
+`mysql -u root -p your_db_name < your_sql_file `
+
+Ex: ` mysql -u root -p laravel < data.sql `
