@@ -49,7 +49,6 @@ Route::group([
     'middleware' => [
         'checkLogin',
         'checkAdmin',
-        'verifyToken'
     ],
 ], function () {
     //users
