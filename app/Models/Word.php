@@ -16,11 +16,6 @@ class Word extends Model
         return $this->belongsTo(Vocabulary::class);
     }
 
-    public function cards()
-    {
-        return $this->belongsTo(Card::class);
-    }
-
     public function means(): HasMany
     {
         return $this->hasMany(Mean::class);

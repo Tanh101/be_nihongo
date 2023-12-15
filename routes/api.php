@@ -2,12 +2,14 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DictionaryController;
+use App\Http\Controllers\FlashcardController;
 use App\Http\Controllers\LearningController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\TopicController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VocabularyController;
 use App\Http\Controllers\WordController;
+use App\Models\Flashcard;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -136,4 +138,12 @@ Route::group([
     'prefix' => 'words',
 ], function () {
     Route::get("{word}", [WordController::class, "wordDetail"]);
+});
+
+//flashcardAPI
+Route::group([
+    'prefix' => 'flashcard',
+    'middleware' => 'checkLogin',
+], function () {
+    Route::post('', [FlashcardController::class, "createFlashcard"]);
 });
