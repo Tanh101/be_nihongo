@@ -222,6 +222,7 @@ class LearningController extends Controller
         }
 
         $yourAnswer = $request->answer;
+        $correct = $correct_answer;
 
         if ($question->type === $choice) {
             $correct_answer = (string) $correct_answer->id;
@@ -230,36 +231,78 @@ class LearningController extends Controller
         }
 
         if ($isFinalQuestion) {
-            if ($yourAnswer === $correct_answer) {
-                //update status to finished
+            $isFailed = false;
 
-                //if current is finished => do nothing
-                if ($this->getCurrentStatus($lesson->id) == $finished) {
+            if ($yourAnswer !== $correct_answer) {
+                $isFailed = true;
+                if ($lives >= 1) {
+                    $lives -= 1;
+                }
+                if (count($user->lessons()->wherePivot('lesson_id', $lesson->id)->wherePivot('user_id', $user->id)->get()) == 0) {
+                    $user->lessons()->attach($lesson->id, ['lives' => $lives]);
+                } else {
+                    $user->lessons()->updateExistingPivot($lesson->id, ['lives' => $lives]);
+                }
+            }
+
+            // if ($lives >= 1) {
+            //update status to finished
+
+            //if current is finished => do nothing
+            if ($this->getCurrentStatus($lesson->id) == $finished) {
+                if ($isFailed) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => 'Wrong answer',
+                        'correct_answer' => $correct,
+                        'lives' => $lives
+                    ], 200);
+                } else {
                     return response()->json([
                         'success' => true,
                         'message' => 'Correct answer',
-                        'correct_answer' => $correct_answer,
+                        'correct_answer' => $correct,
                         'lives' => $lives
                     ], 200);
-                } else if ($this->getCurrentLives($lesson->id) >= 1) {
-                    $this->setPivotLessonUser($lesson->id, $finished, 3, true);
+                }
+            } else if ($this->getCurrentLives($lesson->id) >= 1) {
+                $this->setPivotLessonUser($lesson->id, $finished, 3, true);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You must learn this lesson again because you have no lives',
+                    'lives' => $lives
+                ], 400);
+            }
+
+            //unlocked next lesson
+            $lastLessonInTopic = $this->findLastLessonByTopicId($lesson->topic_id);
+
+            //check if lesson is not last lesson in topic => unlocked next lesson
+            if ($lastLessonInTopic->id != $lesson->id) {
+                $nextLesson = Lesson::where('topic_id', $lesson->topic_id)->where('id', '>', $lesson->id)->first();
+                if ($nextLesson) {
+                    if (count($user->lessons()->wherePivot('lesson_id', $nextLesson->id)->wherePivot('user_id', $user->id)->get()) == 0) {
+                        $user->lessons()->attach($nextLesson->id, ['status' => $unlocked, 'lives' => 3]);
+                    } else {
+                        $user->lessons()->updateExistingPivot($nextLesson->id, ['lives' => 3]);
+                    }
                 } else {
                     return response()->json([
                         'success' => false,
-                        'message' => 'You must learn this lesson again because you have no lives',
+                        'message' => 'Next lesson not found',
                         'lives' => $lives
-                    ], 400);
+                    ], 404);
                 }
 
-                //unlocked next lesson
-                $lastLessonInTopic = $this->findLastLessonByTopicId($lesson->topic_id);
-
-                //check if lesson is not last lesson in topic => unlocked next lesson
-                if ($lastLessonInTopic->id != $lesson->id) {
-                    $nextLesson = Lesson::where('topic_id', $lesson->topic_id)->where('id', '>', $lesson->id)->first();
+                // check if lesson is last lesson in topic => unlocked next topic
+            } else {
+                $nextTopic = Topic::where('id', '>', $lesson->topic_id)->first();
+                if ($nextTopic) {
+                    $nextLesson = Lesson::where('topic_id', $nextTopic->id)->first();
                     if ($nextLesson) {
                         if (count($user->lessons()->wherePivot('lesson_id', $nextLesson->id)->wherePivot('user_id', $user->id)->get()) == 0) {
-                            $user->lessons()->attach($nextLesson->id, ['status' => $unlocked, 'lives' => 3]);
+                            $user->lessons()->attach($nextLesson->id, ['status' => 'unlocked', 'lives' => 3]);
                         } else {
                             $user->lessons()->updateExistingPivot($nextLesson->id, ['lives' => 3]);
                         }
@@ -270,51 +313,34 @@ class LearningController extends Controller
                             'lives' => $lives
                         ], 404);
                     }
-
-                    // check if lesson is last lesson in topic => unlocked next topic
                 } else {
-                    $nextTopic = Topic::where('id', '>', $lesson->topic_id)->first();
-                    if ($nextTopic) {
-                        $nextLesson = Lesson::where('topic_id', $nextTopic->id)->first();
-                        if ($nextLesson) {
-                            if (count($user->lessons()->wherePivot('lesson_id', $nextLesson->id)->wherePivot('user_id', $user->id)->get()) == 0) {
-                                $user->lessons()->attach($nextLesson->id, ['status' => 'unlocked', 'lives' => 3]);
-                            } else {
-                                $user->lessons()->updateExistingPivot($nextLesson->id, ['lives' => 3]);
-                            }
-                        } else {
-                            return response()->json([
-                                'success' => false,
-                                'message' => 'Next lesson not found',
-                                'lives' => $lives
-                            ], 404);
-                        }
-                    } else {
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'Next topic not found',
-                            'lives' => $lives
-                        ], 404);
-                    }
-                }
-
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Correct answer',
-                    'correct_answer' => $correct_answer,
-                    'lives' => $lives
-                ], 200);
-            } else {
-                if ($lives >= 1) {
-                    $lives -= 1;
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Next topic not found',
+                        'lives' => $lives
+                    ], 404);
                 }
             }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Correct answer',
+                'correct_answer' => $correct,
+                'lives' => $lives
+            ], 200);
+            // } else {
+            //     return response()->json([
+            //         'success' => false,
+            //         'message' => 'You must learn this lesson again because you have no lives',
+            //         'lives' => $lives
+            //     ], 400);
+            // }
         } else {
             if ($yourAnswer === $correct_answer) {
                 return response()->json([
                     'success' => true,
                     'message' => 'Correct answer',
-                    'correct_answer' => $correct_answer,
+                    'correct_answer' => $correct,
                     'lives' => $lives
                 ], 200);
             } else {
@@ -322,14 +348,14 @@ class LearningController extends Controller
                     $lives -= 1;
                 }
             }
+            $user->lessons()->updateExistingPivot($lesson->id, ['lives' => $lives]);
         }
-
-        $user->lessons()->updateExistingPivot($lesson->id, ['lives' => $lives]);
+        // $user->lessons()->updateExistingPivot($lesson->id, ['lives' => $lives]);
 
         return response()->json([
             'success' => true,
             'message' => 'Wrong answer',
-            'correct_answer' => $correct_answer,
+            'correct_answer' => $correct,
             'lives' => $lives
         ], 200);
     }
