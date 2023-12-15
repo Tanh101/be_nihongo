@@ -322,12 +322,21 @@ class LearningController extends Controller
                 }
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Correct answer',
-                'correct_answer' => $correct,
-                'lives' => $lives
-            ], 200);
+            if ($isFailed) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Wrong answer',
+                    'correct_answer' => $correct,
+                    'lives' => $lives
+                ], 200);
+            } else {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Correct answer',
+                    'correct_answer' => $correct,
+                    'lives' => $lives
+                ], 200);
+            }
             // } else {
             //     return response()->json([
             //         'success' => false,
