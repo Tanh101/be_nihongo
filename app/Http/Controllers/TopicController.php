@@ -477,7 +477,15 @@ class TopicController extends Controller
                 'topicName' => $firstItem->topicName,
                 'topicImage' => $firstItem->topicImage,
                 'lessons' => $items->map(function ($item, $key2) use ($key) {
-                    $status = ($key === 1 && $key2 === 0) ? 'unlocked' : ($item->status ?? 'locked');
+                    if($item->status === null){
+                        if($key === 1 && $key2 === 0) {
+                            $status = 'unlocked';
+                        }else {
+                            $status = 'locked';
+                        }
+                    }else {
+                        $status = $item->status;
+                    }
 
                     if ($item->lessonId !== null) {
                         return [
