@@ -9,6 +9,51 @@ use Illuminate\Support\Facades\Validator;
 
 class FlashcardController extends Controller
 {
+    /**
+     * @OA\Post(
+     *      path="/api/flashcard",
+     *      tags={"Flashcard"},
+     *      summary="Create flashcard",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\RequestBody(
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                  property="name",
+     *                  description="Name",
+     *                  type="string"
+     *              ),
+     *              @OA\Property(
+     *                  property="description",
+     *                  description="Description",
+     *                  type="string"
+     *              ),
+     *              @OA\Property(
+     *                  property="cards",
+     *                  description="Cards",
+     *                  type="array",
+     *                  @OA\Items(
+     *                      @OA\Property(
+     *                          property="word",
+     *                          type="string",
+     *                          description="Word"
+     *                      ),
+     *                      @OA\Property(
+     *                          property="definition",
+     *                          type="string",
+     *                          description="Definition"
+     *                      ),
+     *                  ),
+     *              ),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Create Successfully",
+     *       ),
+     *     ),
+     *   )
+     */
+
     public function createFlashcard(Request $request)
     {
         $initialStatus = 'active';
@@ -65,6 +110,23 @@ class FlashcardController extends Controller
         ], 200);
     }
 
+    /**
+     * @OA\Get(
+     *      path="/api/flashcard/{id}",
+     *      tags={"Flashcard"},
+     *      summary="Get Cards by flashcard id",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Parameter(
+     *          in="path",
+     *          name="id",
+     *          required=true,
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Get cards successfully",
+     *       ),
+     *     )
+     */
     public function getCardsByFlashcardID($id)
     {
         $flashcard = Flashcard::find($id);
@@ -82,6 +144,18 @@ class FlashcardController extends Controller
         ], 200);
     }
 
+    /**
+     * @OA\Get(
+     *      path="/api/flashcard",
+     *      tags={"Flashcard"},
+     *      summary="Get all flashcard",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Get all flashcard successfully",
+     *       ),
+     *     )
+     */
     public function getAllFlashcard()
     {
         $user = auth()->user();
@@ -101,6 +175,60 @@ class FlashcardController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Put(
+     *      path="/api/flashcard/{id}",
+     *      tags={"Flashcard"},
+     *      summary="Update flashcard",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Parameter(
+     *          in="path",
+     *          name="id",
+     *          required=true,
+     *      ),
+     *      @OA\RequestBody(
+     *          @OA\JsonContent(
+     *                 @OA\Property(
+     *                     property="name",
+     *                     description="Name",
+     *                     type="string",
+     *                 ),
+     *                 @OA\Property(
+     *                     property="description",
+     *                     description="Description",
+     *                     type="string",
+     *                 ),
+     *                 @OA\Property(
+     *                     property="cards",
+     *                     description="Cards",
+     *                     type="array",
+     *                     @OA\Items(
+     *                          @OA\Property(
+     *                              property="id",
+     *                              type="string",
+     *                              description="Card Id"
+     *                          ),
+     *                          @OA\Property(
+     *                              property="word",
+     *                              type="string",
+     *                              description="Word"
+     *                          ),
+     *                          @OA\Property(
+     *                              property="definition",
+     *                              type="string",
+     *                              description="Definition"
+     *                          ),
+     *                     ),
+     *                 ),
+     *                 
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Update successfully",
+     *       ),
+     *     )
+     */
     public function updateFlashcard(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
@@ -177,6 +305,31 @@ class FlashcardController extends Controller
         ], 200);
     }
 
+    /**
+     * @OA\Delete(
+     *      path="/api/flashcard/{id}",
+     *      tags={"Flashcard"},
+     *      summary="Delete flashcard by Id",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Parameter(
+     *          in="path",
+     *          name="id",
+     *          required=true,
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Card deleted successfully",
+     *       ),
+     *       @OA\Response(
+     *          response=404,
+     *          description="Flashcard not found",
+     *       ),
+     *       @OA\Response(
+     *          response=403,
+     *          description="You are not the owner of this flashcard",
+     *       ),
+     *     )
+     */
     public function deleteFlashcard($id)
     {
 
@@ -203,6 +356,31 @@ class FlashcardController extends Controller
         ], 200);
     }
 
+    /**
+     * @OA\Delete(
+     *      path="/api/cards/{id}",
+     *      tags={"Cards"},
+     *      summary="Delete Card by id",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\Parameter(
+     *          in="path",
+     *          name="id",
+     *          required=true,
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Deleted card successfully",
+     *       ),
+     *       @OA\Response(
+     *          response=403,
+     *          description="You are not the owner of this flashcard",
+     *       ),
+     *       @OA\Response(
+     *          response=404,
+     *          description="Card not found",
+     *       ),
+     *     )
+     */
     public function deleteCard($id)
     {
         $card = Card::find($id);
@@ -212,7 +390,15 @@ class FlashcardController extends Controller
                 'message' => 'Card not found'
             ], 404);
         }
-        if (!$this->isOwnerFlashcard($card->flashcard_id)) {
+        $flashcard = Flashcard::find($card->flashcard_id);
+        if(!$flashcard) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Flashcard not found'
+            ], 404);
+        }
+        
+        if (!$this->isOwnerFlashcard($flashcard->id)) {
             return response()->json([
                 'success' => false,
                 'message' => 'You are not the owner of this flashcard'

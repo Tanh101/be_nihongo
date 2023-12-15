@@ -512,6 +512,230 @@
                 ]
             }
         },
+        "/api/flashcard": {
+            "get": {
+                "tags": [
+                    "Flashcard"
+                ],
+                "summary": "Get all flashcard",
+                "operationId": "631266620a38fcfe4e257bc80510a7db",
+                "responses": {
+                    "200": {
+                        "description": "Get all flashcard successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Flashcard"
+                ],
+                "summary": "Create flashcard",
+                "operationId": "724fc264fbe1ac530f92aab02953212c",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "description": "Name",
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "description": "Description",
+                                        "type": "string"
+                                    },
+                                    "cards": {
+                                        "description": "Cards",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "word": {
+                                                    "description": "Word",
+                                                    "type": "string"
+                                                },
+                                                "definition": {
+                                                    "description": "Definition",
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Create Successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/flashcard/{id}": {
+            "get": {
+                "tags": [
+                    "Flashcard"
+                ],
+                "summary": "Get Cards by flashcard id",
+                "operationId": "a6377a8ee0ae98c63698e2ab021a72a7",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Get cards successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Flashcard"
+                ],
+                "summary": "Update flashcard",
+                "operationId": "2a5cce171ae73e41786bdf97e01bb4e8",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "description": "Name",
+                                        "type": "string"
+                                    },
+                                    "description": {
+                                        "description": "Description",
+                                        "type": "string"
+                                    },
+                                    "cards": {
+                                        "description": "Cards",
+                                        "type": "array",
+                                        "items": {
+                                            "properties": {
+                                                "id": {
+                                                    "description": "Card Id",
+                                                    "type": "string"
+                                                },
+                                                "word": {
+                                                    "description": "Word",
+                                                    "type": "string"
+                                                },
+                                                "definition": {
+                                                    "description": "Definition",
+                                                    "type": "string"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Update successfully"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Flashcard"
+                ],
+                "summary": "Delete flashcard by Id",
+                "operationId": "1bd651a81e100eb3d8674bbf4842969d",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Card deleted successfully"
+                    },
+                    "404": {
+                        "description": "Flashcard not found"
+                    },
+                    "403": {
+                        "description": "You are not the owner of this flashcard"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cards/{id}": {
+            "delete": {
+                "tags": [
+                    "Cards"
+                ],
+                "summary": "Delete Card by id",
+                "operationId": "85453744c9c8b62db1c77e54b97fc47e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Deleted card successfully"
+                    },
+                    "403": {
+                        "description": "You are not the owner of this flashcard"
+                    },
+                    "404": {
+                        "description": "Card not found"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/learn/{id}": {
             "post": {
                 "tags": [
