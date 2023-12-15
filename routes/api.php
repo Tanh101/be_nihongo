@@ -143,7 +143,31 @@ Route::group([
 //flashcardAPI
 Route::group([
     'prefix' => 'flashcard',
-    'middleware' => 'checkLogin',
+    'middleware' => [
+        'checkLogin',
+    ]
 ], function () {
+    Route::get('', [FlashcardController::class, "getAllFlashcard"]);
+    Route::get('/{id}', [FlashcardController::class, "getCardsByFlashcardID"]);
     Route::post('', [FlashcardController::class, "createFlashcard"]);
+    Route::put('/{id}', [FlashcardController::class, "updateFlashcard"]);
+    Route::delete('/{id}', [FlashcardController::class, "deleteFlashcard"]);
 });
+
+//card api
+Route::group([
+    'prefix' => 'cards',
+    'middleware' => [
+        'checkLogin',
+    ]
+], function () {
+    Route::delete('{id}', [FlashcardController::class, "deleteCard"]);
+});
+
+//learn flashcard api
+// Route::group([
+//     'prefix' => 'cards',
+//     'middleware' => 'checkLogin',
+// ], function () {
+//     Route::get('/{id}', [FlashcardController::class, "getCardsByFlashcardID"]);
+// });
