@@ -9,15 +9,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Card extends Model
 {
-    public function words()
-    {
-        return $this->belongsTo(Word::class);
-    }
-
     public function flashcards()
     {
         return $this->belongsTo(Flashcard::class);
     }
+
+    protected $guarded = [];
 
     use HasFactory, SoftDeletes;
 }

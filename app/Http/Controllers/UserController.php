@@ -41,11 +41,17 @@ class UserController extends Controller
     public function get_all_users(Request $request)
     {
         $status = $request->status;
+        $name = $request->name;
+
         $perPage = $request->input('per_page', 10);
-        if($status == null) {
-            $users = User::paginate($perPage);
+        if ($status == null) {
+            if ($name != null) {
+                $users = User::where('name', 'like', '%' . $name . '%')->where('role', 'user')->paginate($perPage);
+            } else {
+                $users = User::where('role', 'user')->paginate($perPage);
+            }
         } else {
-            $users = User::where('status', $status)->paginate($perPage);
+            $users = User::where('status', $status)->where('role', 'user')->paginate($perPage);
         }
         if ($users->isEmpty()) {
             return response()->json([
@@ -130,5 +136,4 @@ class UserController extends Controller
             'user' => $user
         ], 200);
     }
-
 }

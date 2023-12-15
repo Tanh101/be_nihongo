@@ -2,12 +2,14 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DictionaryController;
+use App\Http\Controllers\FlashcardController;
 use App\Http\Controllers\LearningController;
 use App\Http\Controllers\LessonController;
 use App\Http\Controllers\TopicController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VocabularyController;
 use App\Http\Controllers\WordController;
+use App\Models\Flashcard;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -49,7 +51,6 @@ Route::group([
     'middleware' => [
         'checkLogin',
         'checkAdmin',
-        'verifyToken'
     ],
 ], function () {
     //users
@@ -138,3 +139,35 @@ Route::group([
 ], function () {
     Route::get("{word}", [WordController::class, "wordDetail"]);
 });
+
+//flashcardAPI
+Route::group([
+    'prefix' => 'flashcard',
+    'middleware' => [
+        'checkLogin',
+    ]
+], function () {
+    Route::get('', [FlashcardController::class, "getAllFlashcard"]);
+    Route::get('/{id}', [FlashcardController::class, "getCardsByFlashcardID"]);
+    Route::post('', [FlashcardController::class, "createFlashcard"]);
+    Route::put('/{id}', [FlashcardController::class, "updateFlashcard"]);
+    Route::delete('/{id}', [FlashcardController::class, "deleteFlashcard"]);
+});
+
+//card api
+Route::group([
+    'prefix' => 'cards',
+    'middleware' => [
+        'checkLogin',
+    ]
+], function () {
+    Route::delete('{id}', [FlashcardController::class, "deleteCard"]);
+});
+
+//learn flashcard api
+// Route::group([
+//     'prefix' => 'cards',
+//     'middleware' => 'checkLogin',
+// ], function () {
+//     Route::get('/{id}', [FlashcardController::class, "getCardsByFlashcardID"]);
+// });
