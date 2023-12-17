@@ -240,7 +240,7 @@ class FlashcardController extends Controller
             'name' => 'required|string',
             'description' => 'string|max:255',
             'cards' => 'required|array',
-            'cards.*.id' => 'required|string|max:255',
+            'cards.*.id' => 'required|max:255',
             'cards.*.word' => 'required|string|max:255',
             'cards.*.definition' => 'required|string|max:255'
         ]);
