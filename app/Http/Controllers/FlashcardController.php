@@ -168,6 +168,11 @@ class FlashcardController extends Controller
             ]);
         }
 
+        foreach ($flashcards as $flashcard) {
+            $word_count = Card::where('flashcard_id', $flashcard->id)->count();
+            $flashcard->word_count = $word_count;
+        }
+
         return response()->json([
             'success' => true,
             'message' => 'Get all flashcard successfully',
@@ -235,7 +240,7 @@ class FlashcardController extends Controller
             'name' => 'required|string',
             'description' => 'string|max:255',
             'cards' => 'required|array',
-            'cards.*.id' => 'required|string|max:255',
+            'cards.*.id' => 'required|max:255',
             'cards.*.word' => 'required|string|max:255',
             'cards.*.definition' => 'required|string|max:255'
         ]);
