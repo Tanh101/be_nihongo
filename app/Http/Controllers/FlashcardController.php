@@ -241,8 +241,8 @@ class FlashcardController extends Controller
             'description' => 'string|max:255',
             'cards' => 'required|array',
             'cards.*.id' => 'required|max:255',
-            'cards.*.word' => 'required|string|max:255',
-            'cards.*.definition' => 'required|string|max:255'
+            'cards.*.word' => 'required|string|max:600',
+            'cards.*.definition' => 'required|string|max:600'
         ]);
 
         if ($validator->fails()) {

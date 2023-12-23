@@ -58,14 +58,14 @@ Route::group([
     Route::patch('users/{id}', [UserController::class, "update_status"])->name('ban_unban');
 
     //lessons
-    Route::get("lessons/", [LessonController::class, "get_all_lessons_admin"]);
+    Route::get("lessons", [LessonController::class, "get_all_lessons_admin"]);
     Route::post("lessons/", [LessonController::class, "create_lesson"]);
     Route::put("lessons/{id}", [LessonController::class, "update_lesson"]);
     Route::patch("lessons/{id}", [LessonController::class, "restore_lesson"]);
     Route::delete("lessons/{id}", [LessonController::class, "delete_lesson"]);
 
     //topics
-    Route::post("topics/", [TopicController::class, "create_topic"]);
+    Route::post("topics", [TopicController::class, "create_topic"]);
     Route::put("topics/{id}", [TopicController::class, "update_topic"]);
     Route::delete("topics/{id}", [TopicController::class, "delete_topic"]);
     Route::get('topics', [TopicController::class, "get_all_topics_by_admin"]);

@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Answer;
 use App\Models\Lesson;
+use App\Models\Question;
 use App\Models\Topic;
+use App\Models\Vocabulary;
+use App\Models\Word;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -132,7 +136,16 @@ class LessonController extends Controller
             'topic_id' => 'required|exists:topics,id',
             'title' => 'required|string',
             'description' => 'required|string',
-            'image' => 'nullable|string'
+            'image' => 'nullable|string',
+            'vocabularies' => 'required|array',
+            'vocabularies.*.word_id' => 'required|string|max:255',
+            'vocabularies.*.questions' => 'required|array',
+            'vocabularies.*.questions.*.type' => 'required|string|max:255',
+            'vocabularies.*.questions.*.content' => 'required|string|max:255',
+            'vocabularies.*.questions.*.meaning' => 'required|string|max:255',
+            'vocabularies.*.questions.*.answers' => 'required|array',
+            'vocabularies.*.questions.*.answer.*.content' => 'required|string|max:255',
+            'vocabularies.*.questions.*.answer.*.is_correct' => 'int|max:1',
         ]);
 
         if ($validator->failed()) {
@@ -165,9 +178,113 @@ class LessonController extends Controller
             ], 500);
         }
 
+        $vocabularies = $request->vocabularies;
+
+        foreach ($vocabularies as $vocabulary) {
+            $word = Word::where('id', $vocabulary['word_id'])->first();
+            if (!$word) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Word not found',
+                ], 404);
+            }
+
+            $vocabularyInDB = Vocabulary::where('word_id', $word->id)->first();
+
+            if (!$vocabularyInDB) {
+                $vocabularyInDB = Vocabulary::create([
+                    'user_id' => auth()->user()->id,
+                    'word_id' => $word->id,
+                    'lesson_id' => $lesson->id,
+                ]);
+            }
+
+            $questions = $vocabulary['questions'];
+            foreach ($questions as $question) {
+                //check type question
+                if ($question['type'] != 'writing' && $question['type'] != 'choice') {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Question Creation Error - Type is not valid',
+                    ], 500);
+                }
+
+                $newQuestion = Question::create([
+                    'vocabulary_id' => $vocabularyInDB->id,
+                    'type' => $question['type'],
+                    'content' => $question['content'],
+                    'meaning' => $question['meaning'],
+                ]);
+
+
+
+                if (!$newQuestion) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Question Creation Error',
+                    ], 500);
+                }
+
+                //check type question and create answer
+                $answers = $question['answers'];
+                if ($newQuestion->type == 'writing') {
+                    $answer = Answer::create([
+                        'question_id' => $newQuestion->id,
+                        'content' => $answers[0]['content'],
+                        'is_correct' => 1,
+                    ]);
+
+                    if (!$answer) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Answer Creation Error',
+                        ], 500);
+                    }
+                } else if ($newQuestion->type == 'choice') {
+                    $countCorrect = 0;
+
+                    if (count($answers) < 4) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Answer Creation Error',
+                        ], 500);
+                    }
+
+                    //check correct answer is only one
+                    foreach ($answers as $answer) {
+                        if ($answer['is_correct'] == 1) {
+                            $countCorrect++;
+                        }
+                    }
+
+                    if ($countCorrect != 1) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Answer Creation Error - Correct Answer is only one',
+                        ], 500);
+                    }
+
+                    foreach ($answers as $answer) {
+                        $newAnswer = Answer::create([
+                            'question_id' => $newQuestion->id,
+                            'content' => $answer['content'],
+                            'is_correct' => $answer['is_correct'],
+                        ]);
+
+                        if (!$newAnswer) {
+                            return response()->json([
+                                'success' => false,
+                                'message' => 'Answer Creation Error',
+                            ], 500);
+                        }
+                    }
+                }
+            }
+        }
+
         return response()->json([
             'success' => true,
-            'message' => 'Create lesson successfully',
+            'message' => 'Create lesson and questions successfully',
             'lesson' => $lesson
         ], 200);
     }
@@ -223,6 +340,17 @@ class LessonController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string|max:255',
             'image' => 'nullable|string|max:255',
+            'vocabularies' => 'required|array',
+            'vocabularies.*.id' => 'required|string|max:255',
+            'vocabularies.*.questions' => 'required|array',
+            'vocabularies.*.questions.*.id' => 'required|string|max:255',
+            'vocabularies.*.questions.*.type' => 'required|string|max:255',
+            'vocabularies.*.questions.*.content' => 'required|string|max:255',
+            'vocabularies.*.questions.*.meaning' => 'required|string|max:255',
+            'vocabularies.*.questions.*.answers' => 'required|array',
+            'vocabularies.*.questions.*.answer.*.id' => 'required|string|max:255',
+            'vocabularies.*.questions.*.answer.*.content' => 'required|string|max:255',
+            'vocabularies.*.questions.*.answer.*.is_correct' => 'int|max:1',
         ]);
 
         if ($validator->failed()) {
@@ -247,6 +375,42 @@ class LessonController extends Controller
             'description' => $request->description,
             'image' => $request->image ?? null,
         ]);
+
+        $vocabularies = $request->vocabularies;
+
+        foreach ($vocabularies as $vocabulary) {
+            $questions = $vocabulary['questions'];
+            $voca = Vocabulary::find($vocabulary['id']);
+            $voca->update([
+                'word_id' => $vocabulary['word_id'],
+            ]);
+
+            foreach ($questions as $question) {
+                if ($question['type'] != 'writing' && $question['type'] != 'choice') {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Question Creation Error - Type is not valid',
+                    ], 500);
+                }
+
+                $ques = Question::find($question['id']);
+                $ques->update([
+                    'type' => $question['type'],
+                    'content' => $question['content'],
+                    'meaning' => $question['meaning'],
+                ]);
+
+                $answers = $question['answers'];
+                foreach ($answers as $answer) {
+                    $ans = Answer::find($answer['id']);
+                    $ans->update([
+                        'content' => $answer['content'],
+                        'is_correct' => $answer['is_correct'],
+                    ]);
+                }
+            }
+        }
+
 
         return response()->json([
             'success' => true,
@@ -420,7 +584,7 @@ class LessonController extends Controller
             'vocabularies.word',
             'vocabularies.questions' => function ($query) {
                 $query->where('type', 'choice')->with('answers:id,question_id,content')
-                      ->orWhere('type', 'writing');
+                    ->orWhere('type', 'writing');
             },
             'vocabularies.word.means',
         ])->find($id);
