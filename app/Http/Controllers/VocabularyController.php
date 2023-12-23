@@ -92,7 +92,7 @@ class VocabularyController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'vocabularies' => 'required|array',
-            'vocabularies.*.word' => 'required|string|max:255',
+            'vocabularies.*.id' => 'required|string|max:255',
             'vocabularies.*.questions' => 'required|array',
             'vocabularies.*.questions.*.type' => 'required|string|max:255',
             'vocabularies.*.questions.*.content' => 'required|string|max:255',
@@ -124,7 +124,7 @@ class VocabularyController extends Controller
             $vocabularies = $request->vocabularies;
 
             foreach ($vocabularies as $vocabulary) {
-                $word = Word::where('word', $vocabulary['word'])->first();
+                $word = Word::where('id', $vocabulary['id'])->first();
                 if (!$word) {
                     return response()->json([
                         'success' => false,
@@ -142,8 +142,8 @@ class VocabularyController extends Controller
                     ]);
                 }
 
-                $questions = $vocabulary['questions'];
-                foreach ($questions as $question) {
+                    $questions = $vocabulary['questions'];
+                    foreach ($questions as $question) {
                     //check type question
                     if ($question['type'] != 'writing' && $question['type'] != 'choice') {
                         return response()->json([

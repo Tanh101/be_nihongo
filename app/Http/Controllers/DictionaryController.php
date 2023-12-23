@@ -205,10 +205,11 @@ class DictionaryController extends Controller
     {
         $resultWords = [];
         $word = $request->query('word');
+        $limit = $request->query('limit') ?? 5;
         if (!$word)
             $words = Word::with('means')->limit(5)->get();
         else
-            $words = Word::where('word', 'like', '%' . $word . '%')->with('means')->limit(5)->get();
+            $words = Word::where('word', 'like', '%' . $word . '%')->with('means')->limit($limit)->get();
         foreach ($words as $word) {
             $resultWords[] = [
                 'id' => $word->id,
