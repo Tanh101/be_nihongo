@@ -90,6 +90,23 @@ class LessonController extends Controller
         ], 200);
     }
 
+    public function get_lesson_by_id($id) {
+        $lesson = Lesson::find($id);
+
+        if (!$lesson) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Lesson not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Get lesson successfully',
+            'lesson' => $lesson
+        ], 200);
+    }
+
     /**
      * @OA\Post(
      *     path="/api/dashboard/lessons",
