@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DictionaryController;
 use App\Http\Controllers\FlashcardController;
@@ -59,6 +60,7 @@ Route::group([
 
     //lessons
     Route::get("lessons", [LessonController::class, "get_all_lessons_admin"]);
+    Route::get("lessons/{id}", [LessonController::class, "get_lesson_by_id"]);
     Route::post("lessons/", [LessonController::class, "create_lesson"]);
     Route::put("lessons/{id}", [LessonController::class, "update_lesson"]);
     Route::patch("lessons/{id}", [LessonController::class, "restore_lesson"]);
@@ -80,6 +82,9 @@ Route::group([
     Route::post("dictionaries", [DictionaryController::class, "createDictionary"]);
     Route::put("dictionaries/{id}", [DictionaryController::class, "updateDictionary"]);
     Route::delete("dictionaries/{id}", [DictionaryController::class, "deleteDictionary"]);
+
+    //analytics
+    Route::get("analytics", [AnalyticsController::class, "getAnalytics"]);
 });
 
 //Topics API
