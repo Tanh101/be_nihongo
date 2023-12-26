@@ -321,13 +321,31 @@ class TopicController extends Controller
             'current_page' => $topics->currentPage(),
             'total_pages' => $totalPages,
         ];
-
+        $res = [];
+        foreach ($topics as $topic) {
+            $lessons = [];
+            foreach ($topic->lessons as $lesson) {
+                $lessons[] = [
+                    'lessonId' => $lesson->id,
+                    'lessonTitle' => $lesson->title,
+                    'lessonDescription' => $lesson->description,
+                    'lessonImage' => $lesson->image,
+                    'status' => $lesson->status,
+                ];
+            }
+            $res[] = [
+                'topicId' => $topic->id,
+                'topicName' => $topic->name,
+                'topicImage' => $topic->image,
+                'lessons' => $lessons,
+            ];
+        }
         return response()->json([
             'success' => true,
             'message' => 'Get topics successfully',
             'total_result' => $topics->total(),
             'pagination' => $pagination,
-            'topics' => $topics->items()
+            'topics' => $res,
         ], 200);
     }
 
