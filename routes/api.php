@@ -76,6 +76,7 @@ Route::group([
     Route::post("vocabularies/{id}", [VocabularyController::class, "create_vocabularies_questions"]);
 
     //dictonaries
+    Route::get("dictionaries", [DictionaryController::class, "getAllDictionaries"]);
     Route::post("dictionaries", [DictionaryController::class, "createDictionary"]);
     Route::put("dictionaries/{id}", [DictionaryController::class, "updateDictionary"]);
     Route::delete("dictionaries/{id}", [DictionaryController::class, "deleteDictionary"]);
