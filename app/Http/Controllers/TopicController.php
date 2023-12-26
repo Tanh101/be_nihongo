@@ -174,7 +174,6 @@ class TopicController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255|unique:topics',
             'description' => 'required|string|max:255',
-            'image' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -304,9 +303,9 @@ class TopicController extends Controller
         $perPage = $request->input('per_page', 10);
 
         if ($status == null) {
-            $topics = Topic::paginate($perPage, ['*'], 'page', $curPage);
+            $topics = Topic::with('lessons')->paginate($perPage, ['*'], 'page', $curPage);
         } else if ($status == 'deleted') {
-            $topics = Topic::onlyTrashed()->paginate($perPage, ['*'], 'page', $curPage);
+            $topics = Topic::with('lesons')->onlyTrashed()->paginate($perPage, ['*'], 'page', $curPage);
         }
 
         if ($topics->isEmpty()) {
@@ -322,13 +321,31 @@ class TopicController extends Controller
             'current_page' => $topics->currentPage(),
             'total_pages' => $totalPages,
         ];
-
+        $res = [];
+        foreach ($topics as $topic) {
+            $lessons = [];
+            foreach ($topic->lessons as $lesson) {
+                $lessons[] = [
+                    'lessonId' => $lesson->id,
+                    'lessonTitle' => $lesson->title,
+                    'lessonDescription' => $lesson->description,
+                    'lessonImage' => $lesson->image,
+                    'status' => $lesson->status,
+                ];
+            }
+            $res[] = [
+                'topicId' => $topic->id,
+                'topicName' => $topic->name,
+                'topicImage' => $topic->image,
+                'lessons' => $lessons,
+            ];
+        }
         return response()->json([
             'success' => true,
             'message' => 'Get topics successfully',
             'total_result' => $topics->total(),
             'pagination' => $pagination,
-            'topics' => $topics->items()
+            'topics' => $res,
         ], 200);
     }
 
@@ -466,6 +483,7 @@ class TopicController extends Controller
                     ->where('lesson_user.user_id', $userId);
             })
             ->whereNull('lessons.deleted_at')
+            ->whereNull('topics.deleted_at')
             ->orderBy('topics.id')
             ->orderBy('lessons.id')
             ->get();
