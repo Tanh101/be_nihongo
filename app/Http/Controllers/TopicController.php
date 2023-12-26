@@ -174,7 +174,6 @@ class TopicController extends Controller
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255|unique:topics',
             'description' => 'required|string|max:255',
-            'image' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {
@@ -304,9 +303,9 @@ class TopicController extends Controller
         $perPage = $request->input('per_page', 10);
 
         if ($status == null) {
-            $topics = Topic::paginate($perPage, ['*'], 'page', $curPage);
+            $topics = Topic::with('lessons')->paginate($perPage, ['*'], 'page', $curPage);
         } else if ($status == 'deleted') {
-            $topics = Topic::onlyTrashed()->paginate($perPage, ['*'], 'page', $curPage);
+            $topics = Topic::with('lesons')->onlyTrashed()->paginate($perPage, ['*'], 'page', $curPage);
         }
 
         if ($topics->isEmpty()) {
@@ -466,6 +465,7 @@ class TopicController extends Controller
                     ->where('lesson_user.user_id', $userId);
             })
             ->whereNull('lessons.deleted_at')
+            ->whereNull('topics.deleted_at')
             ->orderBy('topics.id')
             ->orderBy('lessons.id')
             ->get();

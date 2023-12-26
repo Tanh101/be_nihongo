@@ -105,14 +105,14 @@ class DictionaryController extends Controller
             'dictionaries.*.means.*.example_meaning' => 'string',
             'dictionaries.*.means.*.image' => 'string',
         ]);
-        
+
         if ($validator->fails()) {
             return response()->json([
                 'status' => 'error',
                 'message' => $validator->errors()
             ], 400);
         }
-        
+
 
         $dictionaries = $request->input('dictionaries');
         foreach ($dictionaries as $dictionary) {
@@ -207,7 +207,7 @@ class DictionaryController extends Controller
         $word = $request->query('word');
         $limit = $request->query('limit') ?? 5;
         if (!$word)
-            $words = Word::with('means')->limit(5)->get();
+            $words = Word::with('means')->limit($limit)->get();
         else
             $words = Word::where('word', 'like', '%' . $word . '%')->with('means')->limit($limit)->get();
         foreach ($words as $word) {
@@ -416,6 +416,44 @@ class DictionaryController extends Controller
         return response()->json([
             'status' => 'success',
             'message' => 'Delete dictionary successfully'
+        ], 200);
+    }
+
+    public function getAllDictionary(Request $request)
+    {
+        $resultWords = [];
+        $perpage = $request->query('perpage') ?? 10;
+
+        $words = Word::with('means')->paginate($perpage)->get();
+        foreach ($words as $word) {
+            $resultWords[] = [
+                'id' => $word->id,
+                'word' => $word->word,
+                'pronunciation' => $word->pronunciation,
+                'sino_vietnamese' => $word->sino_vietnamese,
+                'means' => $word->means->isNotEmpty() ? [$word->means->first()] : [],
+            ];
+        }
+        if (!$resultWords) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Word not found'
+            ], 404);
+        }
+
+        $totalPages = ceil($users->total() / $perPage);
+        $pagination = [
+            'per_page' => $users->perPage(),
+            'current_page' => $users->currentPage(),
+            'total_pages' => $totalPages,
+        ];
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Get users successfully',
+            'total_result' => $users->total(),
+            'pagination' => $pagination,
+            'users' => $users->items()
         ], 200);
     }
 }
