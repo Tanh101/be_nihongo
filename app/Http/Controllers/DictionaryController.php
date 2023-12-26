@@ -419,12 +419,13 @@ class DictionaryController extends Controller
         ], 200);
     }
 
-    public function getAllDictionary(Request $request)
+    public function getAllDictionaries(Request $request)
     {
         $resultWords = [];
-        $perpage = $request->query('perpage') ?? 10;
+        $perPage = $request->query('per_page') ?? 10;
+        $curPage = $request->query('cur_page') ?? 1;
 
-        $words = Word::with('means')->paginate($perpage)->get();
+        $words = Word::with('means')->paginate($perPage, ['*'], 'page', $curPage);
         foreach ($words as $word) {
             $resultWords[] = [
                 'id' => $word->id,
@@ -441,19 +442,19 @@ class DictionaryController extends Controller
             ], 404);
         }
 
-        $totalPages = ceil($users->total() / $perPage);
+        $totalPages = ceil($words->total() / $perPage);
         $pagination = [
-            'per_page' => $users->perPage(),
-            'current_page' => $users->currentPage(),
+            'per_page' => $words->perPage(),
+            'current_page' => $words->currentPage(),
             'total_pages' => $totalPages,
         ];
 
         return response()->json([
             'success' => true,
-            'message' => 'Get users successfully',
-            'total_result' => $users->total(),
+            'message' => 'Get dictionaries successfully',
+            'total_result' => $words->total(),
             'pagination' => $pagination,
-            'users' => $users->items()
+            'dictionaries' => $resultWords
         ], 200);
     }
 }
