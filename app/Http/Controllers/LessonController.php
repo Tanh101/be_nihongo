@@ -94,9 +94,13 @@ class LessonController extends Controller
 
     public function get_lesson_by_id($id)
     {
-        $lesson = Lesson::find($id);
+        $result = Lesson::with([
+            'vocabularies.word',
+            'vocabularies.questions.answers',
+            'vocabularies.word.means',
+        ])->find($id);
 
-        if (!$lesson) {
+        if (!$result) {
             return response()->json([
                 'success' => false,
                 'message' => 'Lesson not found',
@@ -106,7 +110,7 @@ class LessonController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Get lesson successfully',
-            'lesson' => $lesson
+            'lesson' => $result
         ], 200);
     }
 
