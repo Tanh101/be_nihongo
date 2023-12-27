@@ -9,7 +9,9 @@ use App\Models\Topic;
 use App\Models\Vocabulary;
 use App\Models\Word;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Throwable;
 
 class LessonController extends Controller
 {
@@ -90,7 +92,8 @@ class LessonController extends Controller
         ], 200);
     }
 
-    public function get_lesson_by_id($id) {
+    public function get_lesson_by_id($id)
+    {
         $lesson = Lesson::find($id);
 
         if (!$lesson) {
@@ -181,129 +184,150 @@ class LessonController extends Controller
             ], 404);
         }
 
-        $lesson = Lesson::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'topic_id' => $request->topic_id,
-            'image' => $request->image ?? null,
-        ]);
+        try {
+            DB::beginTransaction();
 
-        if (!$lesson) {
+            $lesson = Lesson::create([
+                'title' => $request->title,
+                'description' => $request->description,
+                'topic_id' => $request->topic_id,
+                'image' => $request->image ?? null,
+            ]);
+
+            if (!$lesson) {
+                // return response()->json([
+                //     'success' => false,
+                //     'message' => 'Create lesson failed',
+                // ], 500);
+                throw new \Exception('Create lesson failed', 500);
+            }
+
+            $vocabularies = $request->vocabularies;
+
+            foreach ($vocabularies as $vocabulary) {
+                $word = Word::where('id', $vocabulary['word_id'])->first();
+                if (!$word) {
+                    // return response()->json([
+                    //     'success' => false,
+                    //     'message' => 'Word not found',
+                    // ], 404);
+                    throw new \Exception('Word not found', 404);
+                }
+
+                $vocabularyInDB = Vocabulary::where('word_id', $word->id)->first();
+
+                if (!$vocabularyInDB) {
+                    $vocabularyInDB = Vocabulary::create([
+                        'user_id' => auth()->user()->id,
+                        'word_id' => $word->id,
+                        'lesson_id' => $lesson->id,
+                    ]);
+                }
+
+                $questions = $vocabulary['questions'];
+                foreach ($questions as $question) {
+                    //check type question
+                    if ($question['type'] != 'writing' && $question['type'] != 'choice') {
+                        // return response()->json([
+                        //     'success' => false,
+                        //     'message' => 'Question Creation Error - Type is not valid',
+                        // ], 500);
+                        throw new \Exception('Question Creation Error - Type is not valid', 500);
+                    }
+
+                    $newQuestion = Question::create([
+                        'vocabulary_id' => $vocabularyInDB->id,
+                        'type' => $question['type'],
+                        'content' => $question['content'],
+                        'meaning' => $question['meaning'],
+                    ]);
+
+
+
+                    if (!$newQuestion) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Question Creation Error',
+                        ], 500);
+                    }
+
+                    //check type question and create answer
+                    $answers = $question['answers'];
+                    if ($newQuestion->type == 'writing') {
+                        $answer = Answer::create([
+                            'question_id' => $newQuestion->id,
+                            'content' => $answers[0]['content'],
+                            'is_correct' => 1,
+                        ]);
+
+                        if (!$answer) {
+                            // return response()->json([
+                            //     'success' => false,
+                            //     'message' => 'Answer Creation Error',
+                            // ], 500);
+                            throw new \Exception('Answer Creation Error', 500);
+                        }
+                    } else if ($newQuestion->type == 'choice') {
+                        $countCorrect = 0;
+
+                        if (count($answers) < 4) {
+                            // return response()->json([
+                            //     'success' => false,
+                            //     'message' => 'Answer Creation Error',
+                            // ], 500);
+                            throw new \Exception('Answer Creation Error', 500);
+                        }
+
+                        //check correct answer is only one
+                        foreach ($answers as $answer) {
+                            if ($answer['is_correct'] == 1) {
+                                $countCorrect++;
+                            }
+                        }
+
+                        if ($countCorrect != 1) {
+                            // return response()->json([
+                            //     'success' => false,
+                            //     'message' => 'Answer Creation Error - Correct Answer is only one',
+                            // ], 500);
+                            throw new \Exception('Answer Creation Error - Correct Answer is only one', 500);
+                        }
+
+                        foreach ($answers as $answer) {
+                            $newAnswer = Answer::create([
+                                'question_id' => $newQuestion->id,
+                                'content' => $answer['content'],
+                                'is_correct' => $answer['is_correct'],
+                            ]);
+
+                            if (!$newAnswer) {
+                                // return response()->json([
+                                //     'success' => false,
+                                //     'message' => 'Answer Creation Error',
+                                // ], 500);
+                                throw new \Exception('Answer Creation Error', 500);
+                            }
+                        }
+                    }
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Create lesson and questions successfully',
+                'lesson' => $lesson
+            ], 200); 
+
+        } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => 'Create lesson failed',
-            ], 500);
+                'data' => $e->getMessage()
+            ], $e->getCode());
         }
-
-        $vocabularies = $request->vocabularies;
-
-        foreach ($vocabularies as $vocabulary) {
-            $word = Word::where('id', $vocabulary['word_id'])->first();
-            if (!$word) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Word not found',
-                ], 404);
-            }
-
-            $vocabularyInDB = Vocabulary::where('word_id', $word->id)->first();
-
-            if (!$vocabularyInDB) {
-                $vocabularyInDB = Vocabulary::create([
-                    'user_id' => auth()->user()->id,
-                    'word_id' => $word->id,
-                    'lesson_id' => $lesson->id,
-                ]);
-            }
-
-            $questions = $vocabulary['questions'];
-            foreach ($questions as $question) {
-                //check type question
-                if ($question['type'] != 'writing' && $question['type'] != 'choice') {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Question Creation Error - Type is not valid',
-                    ], 500);
-                }
-
-                $newQuestion = Question::create([
-                    'vocabulary_id' => $vocabularyInDB->id,
-                    'type' => $question['type'],
-                    'content' => $question['content'],
-                    'meaning' => $question['meaning'],
-                ]);
-
-
-
-                if (!$newQuestion) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Question Creation Error',
-                    ], 500);
-                }
-
-                //check type question and create answer
-                $answers = $question['answers'];
-                if ($newQuestion->type == 'writing') {
-                    $answer = Answer::create([
-                        'question_id' => $newQuestion->id,
-                        'content' => $answers[0]['content'],
-                        'is_correct' => 1,
-                    ]);
-
-                    if (!$answer) {
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'Answer Creation Error',
-                        ], 500);
-                    }
-                } else if ($newQuestion->type == 'choice') {
-                    $countCorrect = 0;
-
-                    if (count($answers) < 4) {
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'Answer Creation Error',
-                        ], 500);
-                    }
-
-                    //check correct answer is only one
-                    foreach ($answers as $answer) {
-                        if ($answer['is_correct'] == 1) {
-                            $countCorrect++;
-                        }
-                    }
-
-                    if ($countCorrect != 1) {
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'Answer Creation Error - Correct Answer is only one',
-                        ], 500);
-                    }
-
-                    foreach ($answers as $answer) {
-                        $newAnswer = Answer::create([
-                            'question_id' => $newQuestion->id,
-                            'content' => $answer['content'],
-                            'is_correct' => $answer['is_correct'],
-                        ]);
-
-                        if (!$newAnswer) {
-                            return response()->json([
-                                'success' => false,
-                                'message' => 'Answer Creation Error',
-                            ], 500);
-                        }
-                    }
-                }
-            }
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Create lesson and questions successfully',
-            'lesson' => $lesson
-        ], 200);
     }
 
     /**
