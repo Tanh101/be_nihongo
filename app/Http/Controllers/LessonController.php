@@ -322,8 +322,7 @@ class LessonController extends Controller
                 'success' => true,
                 'message' => 'Create lesson and questions successfully',
                 'lesson' => $lesson
-            ], 200); 
-
+            ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -426,6 +425,12 @@ class LessonController extends Controller
         foreach ($vocabularies as $vocabulary) {
             $questions = $vocabulary['questions'];
             $voca = Vocabulary::find($vocabulary['id']);
+            if (!$voca) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Vocabulary not found'
+                ], 404);
+            }
             $voca->update([
                 'word_id' => $vocabulary['word_id'],
             ]);
@@ -439,6 +444,13 @@ class LessonController extends Controller
                 }
 
                 $ques = Question::find($question['id']);
+                if (!$ques) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Question not found',
+                    ], 404);
+                }
+
                 $ques->update([
                     'type' => $question['type'],
                     'content' => $question['content'],
@@ -448,6 +460,12 @@ class LessonController extends Controller
                 $answers = $question['answers'];
                 foreach ($answers as $answer) {
                     $ans = Answer::find($answer['id']);
+                    if (!$ans) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Answer not found',
+                        ], 404);
+                    }
                     $ans->update([
                         'content' => $answer['content'],
                         'is_correct' => $answer['is_correct'],
@@ -495,6 +513,10 @@ class LessonController extends Controller
             ], 404);
         }
 
+        $vocabularies = $lesson->vocabularies;
+        foreach($vocabularies as $vocabulary) {
+            $vocabulary->delete();
+        }
         $lesson->delete();
 
         return response()->json([

@@ -172,7 +172,7 @@ class TopicController extends Controller
     public function update_topic(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255|unique:topics',
+            'name' => 'required|string|max:255',
             'description' => 'required|string|max:255',
         ]);
 
@@ -186,11 +186,27 @@ class TopicController extends Controller
         $topic = Topic::find($id);
 
         if ($topic) {
-            $topic->update([
-                'name' => $request->name,
-                'image' => $request->image ?? null,
-                'description' => $request->description
-            ]);
+            $isExitTopic = Topic::where('name', $request->name)->first();
+            if ($isExitTopic) {
+                if ($topic->id == $isExitTopic->id) {
+                    $topic->update([
+                        'name' => $request->name,
+                        'image' => $request->image ?? null,
+                        'description' => $request->description
+                    ]);
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Topic name must be unique'
+                    ], 400);
+                }
+            } else {
+                $topic->update([
+                    'name' => $request->name,
+                    'image' => $request->image ?? null,
+                    'description' => $request->description
+                ]);
+            }
 
             return response()->json([
                 'success' => 'true',
@@ -321,7 +337,7 @@ class TopicController extends Controller
             'current_page' => $topics->currentPage(),
             'total_pages' => $totalPages,
         ];
-        
+
         return response()->json([
             'success' => true,
             'message' => 'Get topics successfully',
@@ -477,13 +493,13 @@ class TopicController extends Controller
                 'topicName' => $firstItem->topicName,
                 'topicImage' => $firstItem->topicImage,
                 'lessons' => $items->map(function ($item, $key2) use ($key) {
-                    if($item->status === null){
-                        if($key === 1 && $key2 === 0) {
+                    if ($item->status === null) {
+                        if ($key === 1 && $key2 === 0) {
                             $status = 'unlocked';
-                        }else {
+                        } else {
                             $status = 'locked';
                         }
-                    }else {
+                    } else {
                         $status = $item->status;
                     }
 
