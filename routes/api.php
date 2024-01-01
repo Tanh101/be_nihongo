@@ -43,8 +43,9 @@ Route::group([
 ], function () {
     Route::get("profile", [AuthController::class, "user_profile"])->name('profile');
     Route::post("logout", [AuthController::class, "logout"])->name('logout');
-    Route::post("refresh", [AuthController::class, "refresh"])->name('refresh');
 });
+
+Route::post("refresh", [AuthController::class, "refresh"])->name('refresh');
 
 //Admin API
 Route::group([

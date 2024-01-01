@@ -34,5 +34,5 @@ class Vocabulary extends Model
         'user_id',
     ];
 
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 }
