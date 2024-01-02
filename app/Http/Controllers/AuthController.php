@@ -6,7 +6,9 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-
+use PhpParser\Node\Stmt\TryCatch;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -143,7 +145,28 @@ class AuthController extends Controller
             return response()->json(['error' => 'Password incorrect'], 401);
         }
 
-        return $this->createNewToken($token);
+        $refresh_token = $this->refreshToken($user);
+
+        return $this->createNewToken($token, $refresh_token);
+    }
+
+    private function refreshToken($user)
+    {
+        $payload = [
+            'userId' => $user->id,
+            'email' => $user->email,
+            'exp' => config('jwt.refresh_ttl')
+        ];
+
+        $refreshToken = JWTAuth::getJwtProvider()->encode($payload);
+        if ($refreshToken) {
+            return $refreshToken;
+        }
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Jwt encode fails'
+        ], 500);
     }
 
     /**
@@ -186,13 +209,49 @@ class AuthController extends Controller
      */
     public function refresh()
     {
-        return $this->createNewToken(auth()->refresh());
+        try {
+            $refreshToken = request()->refreshToken;
+            
+            if (!$refreshToken) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthenticated'
+                ], 401);
+            }
+
+            $decode = JWTAuth::getJwtProvider()->decode($refreshToken);
+
+            if (!$decode) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'The refresh token invalid or has expired'
+                ], 401);
+            }
+
+            $user = User::find($decode['userId']);
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Refresh token invalid'
+                ], 401);
+            }
+
+            $token = auth('api')->login($user);
+
+            return $this->createNewToken($token, $refreshToken);
+        } catch (JWTException $except) {
+            return response()->json([
+                'success' => false,
+                'message' => $except->getMessage()
+            ], 500);
+        }
     }
 
-    protected function createNewToken($token)
+    protected function createNewToken($token, $refreshToken)
     {
         return response()->json([
             'access_token' => $token,
+            'refresh_token' => $refreshToken,
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL(),
             'user' => auth()->user()
