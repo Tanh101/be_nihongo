@@ -432,15 +432,22 @@ class LessonController extends Controller
             $questions = $vocabulary['questions'];
             $voca = Vocabulary::find($vocabulary['id']);
             if (!$voca) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Vocabulary not found'
-                ], 404);
+                $voca = Vocabulary::create([
+                    'lesson_id' => $vocabulary['lesson_id'],
+                    'user_id' => auth()->user()->id,
+                    'word_id' => $vocabulary['word_id'],
+                ]);
+                if (!$voca) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Create vocabulary fails'
+                    ], 500);
+                }
+            } else {
+                $voca->update([
+                    'word_id' => $vocabulary['word_id'],
+                ]);
             }
-            $voca->update([
-                'word_id' => $vocabulary['word_id'],
-            ]);
-
             foreach ($questions as $question) {
                 if ($question['type'] != 'writing' && $question['type'] != 'choice') {
                     return response()->json([
