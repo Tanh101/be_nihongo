@@ -12,6 +12,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
+    protected $refreshTokens = [];
     /**
      * @OA\Post(
      *     path="/api/auth/register",
@@ -146,6 +147,7 @@ class AuthController extends Controller
         }
 
         $refresh_token = $this->refreshToken($user);
+        $this->refreshTokens[$user->email] = $refresh_token;
 
         return $this->createNewToken($token, $refresh_token);
     }
@@ -211,14 +213,12 @@ class AuthController extends Controller
     {
         try {
             $refreshToken = request()->refreshToken;
-            
             if (!$refreshToken) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Unauthenticated'
                 ], 401);
             }
-
             $decode = JWTAuth::getJwtProvider()->decode($refreshToken);
 
             if (!$decode) {
@@ -276,5 +276,13 @@ class AuthController extends Controller
             'message' => 'Get user profile successfully',
             'user' => $user
         ], 200);
+    }
+
+    public function removeRefreshToken($refresh_token)
+    {
+        $index = array_search($refresh_token, $this->refreshTokens);
+        if ($index != -1) {
+            unset($this->refreshTokens[$index]);
+        }
     }
 }
