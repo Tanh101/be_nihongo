@@ -256,7 +256,7 @@ class DictionaryController extends Controller
                 ->limit($limit)
                 ->get();
         }
-        
+
         if (!$words) {
             return response()->json([
                 'status' => 'error',
@@ -462,8 +462,9 @@ class DictionaryController extends Controller
         $resultWords = [];
         $perPage = $request->query('per_page') ?? 10;
         $curPage = $request->query('cur_page') ?? 1;
+        $word = $request->word;
 
-        $words = Word::with('means')->paginate($perPage, ['*'], 'page', $curPage);
+        $words = Word::where('word', 'like', '%' . $word . '%')->with('means')->paginate($perPage, ['*'], 'page', $curPage);
         foreach ($words as $word) {
             $resultWords[] = [
                 'id' => $word->id,
