@@ -317,9 +317,10 @@ class TopicController extends Controller
         $status = $request->status;
         $curPage = $request->input('cur_page', 1);
         $perPage = $request->input('per_page', 10);
+        $name = $request->name;
 
         if ($status == null) {
-            $topics = Topic::with('lessons')->paginate($perPage, ['*'], 'page', $curPage);
+            $topics = Topic::where('name', 'like', '%' . $name . '%')->with('lessons')->paginate($perPage, ['*'], 'page', $curPage);
         } else if ($status == 'deleted') {
             $topics = Topic::with('lesons')->onlyTrashed()->paginate($perPage, ['*'], 'page', $curPage);
         }

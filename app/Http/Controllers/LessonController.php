@@ -64,7 +64,7 @@ class LessonController extends Controller
 
         if ($status == null) {
             if ($title) {
-                $lessons = Lesson::where('title', $title)->paginate($perPage, ['*'], 'page', $curPage);
+                $lessons = Lesson::where('title', 'like', '%' . $title . '%')->paginate($perPage, ['*'], 'page', $curPage);
             } else {
                 $lessons = Lesson::paginate($perPage, ['*'], 'page', $curPage);
             }
