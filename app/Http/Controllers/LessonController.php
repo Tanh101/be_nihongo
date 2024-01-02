@@ -197,6 +197,7 @@ class LessonController extends Controller
         try {
             DB::beginTransaction();
 
+
             $lesson = Lesson::create([
                 'title' => $request->title,
                 'description' => $request->description,
@@ -205,10 +206,6 @@ class LessonController extends Controller
             ]);
 
             if (!$lesson) {
-                // return response()->json([
-                //     'success' => false,
-                //     'message' => 'Create lesson failed',
-                // ], 500);
                 throw new \Exception('Create lesson failed', 500);
             }
 
@@ -217,16 +214,14 @@ class LessonController extends Controller
             foreach ($vocabularies as $vocabulary) {
                 $word = Word::where('id', $vocabulary['word_id'])->first();
                 if (!$word) {
-                    // return response()->json([
-                    //     'success' => false,
-                    //     'message' => 'Word not found',
-                    // ], 404);
                     throw new \Exception('Word not found', 404);
                 }
 
                 $vocabularyInDB = Vocabulary::where('word_id', $word->id)->first();
 
-                if (!$vocabularyInDB) {
+                if ($vocabularyInDB) {
+                    throw new \Exception('Word has been created in another lesson!', 400);
+                } else {
                     $vocabularyInDB = Vocabulary::create([
                         'user_id' => auth()->user()->id,
                         'word_id' => $word->id,
@@ -238,10 +233,6 @@ class LessonController extends Controller
                 foreach ($questions as $question) {
                     //check type question
                     if ($question['type'] != 'writing' && $question['type'] != 'choice') {
-                        // return response()->json([
-                        //     'success' => false,
-                        //     'message' => 'Question Creation Error - Type is not valid',
-                        // ], 500);
                         throw new \Exception('Question Creation Error - Type is not valid', 500);
                     }
 
@@ -271,20 +262,12 @@ class LessonController extends Controller
                         ]);
 
                         if (!$answer) {
-                            // return response()->json([
-                            //     'success' => false,
-                            //     'message' => 'Answer Creation Error',
-                            // ], 500);
                             throw new \Exception('Answer Creation Error', 500);
                         }
                     } else if ($newQuestion->type == 'choice') {
                         $countCorrect = 0;
 
                         if (count($answers) < 4) {
-                            // return response()->json([
-                            //     'success' => false,
-                            //     'message' => 'Answer Creation Error',
-                            // ], 500);
                             throw new \Exception('Answer Creation Error', 500);
                         }
 
@@ -296,10 +279,6 @@ class LessonController extends Controller
                         }
 
                         if ($countCorrect != 1) {
-                            // return response()->json([
-                            //     'success' => false,
-                            //     'message' => 'Answer Creation Error - Correct Answer is only one',
-                            // ], 500);
                             throw new \Exception('Answer Creation Error - Correct Answer is only one', 500);
                         }
 
@@ -311,10 +290,6 @@ class LessonController extends Controller
                             ]);
 
                             if (!$newAnswer) {
-                                // return response()->json([
-                                //     'success' => false,
-                                //     'message' => 'Answer Creation Error',
-                                // ], 500);
                                 throw new \Exception('Answer Creation Error', 500);
                             }
                         }
@@ -432,16 +407,24 @@ class LessonController extends Controller
             $questions = $vocabulary['questions'];
             $voca = Vocabulary::find($vocabulary['id']);
             if (!$voca) {
-                $voca = Vocabulary::create([
-                    'lesson_id' => $vocabulary['lesson_id'],
-                    'user_id' => auth()->user()->id,
-                    'word_id' => $vocabulary['word_id'],
-                ]);
-                if (!$voca) {
+                $isExit = Vocabulary::where('word_id', $vocabulary['word_id'])->first();
+                if ($isExit) {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Create vocabulary fails'
-                    ], 500);
+                        'message' => 'Word has been create in another lesson'
+                    ], 400);
+                } else {
+                    $voca = Vocabulary::create([
+                        'lesson_id' => $vocabulary['lesson_id'],
+                        'user_id' => auth()->user()->id,
+                        'word_id' => $vocabulary['word_id'],
+                    ]);
+                    if (!$voca) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Create vocabulary fails'
+                        ], 500);
+                    }
                 }
             } else {
                 $voca->update([
