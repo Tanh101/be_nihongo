@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Word extends Model
 {
-    public function vocabularies()
+    public function vocabulary()
     {
         return $this->belongsTo(Vocabulary::class);
     }

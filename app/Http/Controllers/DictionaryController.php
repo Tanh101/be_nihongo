@@ -6,6 +6,7 @@ use App\Models\Dictionary;
 use App\Models\Mean;
 use App\Models\Word;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 use function PHPSTORM_META\map;
@@ -229,6 +230,43 @@ class DictionaryController extends Controller
         return response()->json([
             'status' => 'success',
             'words' => $resultWords
+        ], 200);
+    }
+
+    public function searchWordToCreateLesson(Request $request)
+    {
+        $resultWords = [];
+        $word = $request->query('word');
+        $limit = $request->query('limit') ?? 5;
+        if (!$word) {
+            $words = DB::table('words')
+                ->leftJoin('vocabularies', 'words.id', '=', 'vocabularies.word_id')
+                ->join('means', 'words.id', '=', 'means.word_id')
+                ->whereNull('vocabularies.word_id')
+                ->select('words.*') // Select columns from both tables
+                ->limit($limit)
+                ->get();
+        } else {
+            $words = DB::table('words')
+                ->leftJoin('vocabularies', 'words.id', '=', 'vocabularies.word_id')
+                ->join('means', 'words.id', '=', 'means.word_id')
+                ->whereNull('vocabularies.word_id')
+                ->where('words.word', 'like', '%' . $word . '%')
+                ->select('words.*')
+                ->limit($limit)
+                ->get();
+        }
+        
+        if (!$words) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Word not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'words' => $words
         ], 200);
     }
 

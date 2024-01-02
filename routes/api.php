@@ -171,6 +171,10 @@ Route::group([
     Route::delete('{id}', [FlashcardController::class, "deleteCard"]);
 });
 
+//search
+Route::get("/search", [DictionaryController::class, "searchWordToCreateLesson"]);
+
+
 //learn flashcard api
 // Route::group([
 //     'prefix' => 'cards',
