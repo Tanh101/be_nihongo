@@ -404,8 +404,10 @@ class LessonController extends Controller
         $vocabularies = $request->vocabularies;
 
         foreach ($vocabularies as $vocabulary) {
-            $questions = $vocabulary['questions'];
-            $voca = Vocabulary::find($vocabulary['id']);
+            $voca = null;
+            if (isset($vocabulary['id'])) {
+                $voca = Vocabulary::find($vocabulary['id']);
+            }
             if (!$voca) {
                 $isExit = Vocabulary::where('word_id', $vocabulary['word_id'])->first();
                 if ($isExit) {
@@ -415,7 +417,7 @@ class LessonController extends Controller
                     ], 400);
                 } else {
                     $voca = Vocabulary::create([
-                        'lesson_id' => $vocabulary['lesson_id'],
+                        'lesson_id' => $lesson->id,
                         'user_id' => auth()->user()->id,
                         'word_id' => $vocabulary['word_id'],
                     ]);
@@ -431,6 +433,9 @@ class LessonController extends Controller
                     'word_id' => $vocabulary['word_id'],
                 ]);
             }
+
+            //questions
+            $questions = $vocabulary['questions'];
             foreach ($questions as $question) {
                 if ($question['type'] != 'writing' && $question['type'] != 'choice') {
                     return response()->json([
@@ -463,7 +468,10 @@ class LessonController extends Controller
 
                 $answers = $question['answers'];
                 foreach ($answers as $answer) {
-                    $ans = Answer::find($answer['id']);
+                    $ans = null;
+                    if ($answer['id']) {
+                        $ans = Answer::find($answer['id']);
+                    }
                     if (!$ans) {
                         $newAnser = Answer::create([
                             'question_id' => $ques->id,
