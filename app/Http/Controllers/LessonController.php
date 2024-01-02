@@ -58,11 +58,16 @@ class LessonController extends Controller
     public function get_all_lessons_admin(Request $request)
     {
         $status = $request->status;
+        $title = $request->title;
         $curPage = $request->input('cur_page', 1);
         $perPage = $request->input('per_page', 10);
 
         if ($status == null) {
-            $lessons = Lesson::paginate($perPage, ['*'], 'page', $curPage);
+            if ($title) {
+                $lessons = Lesson::where('title', $title)->paginate($perPage, ['*'], 'page', $curPage);
+            } else {
+                $lessons = Lesson::paginate($perPage, ['*'], 'page', $curPage);
+            }
         } else if ($status == 'deleted') {
             $lessons = Lesson::onlyTrashed()->paginate($perPage, ['*'], 'page', $curPage);
         } else {
@@ -181,6 +186,7 @@ class LessonController extends Controller
         }
 
         $topic = Topic::find($request->topic_id);
+
         if (!$topic) {
             return response()->json([
                 'success' => false,
@@ -445,36 +451,50 @@ class LessonController extends Controller
 
                 $ques = Question::find($question['id']);
                 if (!$ques) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Question not found',
-                    ], 404);
+                    $ques = Question::create([
+                        'vocabulary_id' => $voca->id,
+                        'content' => $question['content'],
+                        'meaning' => $question['meaning'],
+                        'type' => $question['type'],
+                    ]);
+                    if (!$ques) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Question create fails'
+                        ], 500);
+                    }
+                } else {
+                    $ques->update([
+                        'type' => $question['type'],
+                        'content' => $question['content'],
+                        'meaning' => $question['meaning'],
+                    ]);
                 }
-
-                $ques->update([
-                    'type' => $question['type'],
-                    'content' => $question['content'],
-                    'meaning' => $question['meaning'],
-                ]);
 
                 $answers = $question['answers'];
                 foreach ($answers as $answer) {
                     $ans = Answer::find($answer['id']);
                     if (!$ans) {
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'Answer not found',
-                        ], 404);
+                        $newAnser = Answer::create([
+                            'question_id' => $ques->id,
+                            'content' => $answer['content'],
+                            'is_correct' => $answer['is_correct'],
+                        ]);
+                        if (!$newAnser) {
+                            return response()->json([
+                                'success' => false,
+                                'message' => 'Answer create fails',
+                            ], 404);
+                        }
+                    } else {
+                        $ans->update([
+                            'content' => $answer['content'],
+                            'is_correct' => $answer['is_correct'],
+                        ]);
                     }
-                    $ans->update([
-                        'content' => $answer['content'],
-                        'is_correct' => $answer['is_correct'],
-                    ]);
                 }
             }
         }
-
-
         return response()->json([
             'success' => true,
             'message' => 'Update lesson successfully',
@@ -514,7 +534,7 @@ class LessonController extends Controller
         }
 
         $vocabularies = $lesson->vocabularies;
-        foreach($vocabularies as $vocabulary) {
+        foreach ($vocabularies as $vocabulary) {
             $vocabulary->delete();
         }
         $lesson->delete();
