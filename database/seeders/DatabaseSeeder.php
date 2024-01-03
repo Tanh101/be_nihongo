@@ -5,6 +5,7 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 use App\Models\Topic;
+use App\Models\Word;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -14,16 +15,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+
         $this->call([
             AdminSeeder::class,
             TopicSeeder::class,
             LessonSeeder::class,
-            // WordSeeder::class,
-            // MeaningSeeder::class,
-            // UserSeeder::class,
-            // VocabularySeeder::class,
-            // QuestionSeeder::class,
-            // AnswerSeeder::class,
         ]);
     }
 }
