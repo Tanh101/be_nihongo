@@ -8,7 +8,9 @@ use App\Models\Question;
 use App\Models\Topic;
 use App\Models\Vocabulary;
 use App\Models\Word;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Throwable;
@@ -161,41 +163,43 @@ class LessonController extends Controller
      */
     public function create_lesson(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'topic_id' => 'required|exists:topics,id',
-            'title' => 'required|string',
-            'description' => 'required|string',
-            'image' => 'nullable|string',
-            'vocabularies' => 'required|array',
-            'vocabularies.*.word_id' => 'required|string|max:255',
-            'vocabularies.*.questions' => 'required|array',
-            'vocabularies.*.questions.*.type' => 'required|string|max:255',
-            'vocabularies.*.questions.*.content' => 'required|string|max:255',
-            'vocabularies.*.questions.*.meaning' => 'required|string|max:255',
-            'vocabularies.*.questions.*.answers' => 'required|array',
-            'vocabularies.*.questions.*.answer.*.content' => 'required|string|max:255',
-            'vocabularies.*.questions.*.answer.*.is_correct' => 'int|max:1',
-        ]);
-
-        if ($validator->failed()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Create lesson failed',
-                'data' => $validator->errors()
-            ], 400);
-        }
-
-        $topic = Topic::find($request->topic_id);
-
-        if (!$topic) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Topic not found'
-            ], 404);
-        }
-
         try {
+            $validator = Validator::make($request->all(), [
+                'topic_id' => 'required|exists:topics,id',
+                'title' => 'required|string',
+                'description' => 'required|string',
+                'image' => 'nullable|string',
+                'vocabularies' => 'required|array',
+                'vocabularies.*.word_id' => 'required|string|max:255',
+                'vocabularies.*.questions' => 'required|array',
+                'vocabularies.*.questions.*.type' => 'required|string|max:255',
+                'vocabularies.*.questions.*.content' => 'required|string|max:255',
+                'vocabularies.*.questions.*.meaning' => 'required|string|max:255',
+                'vocabularies.*.questions.*.answers' => 'required|array',
+                'vocabularies.*.questions.*.answer.*.content' => 'required|string|max:255',
+                'vocabularies.*.questions.*.answer.*.is_correct' => 'int|max:1',
+            ]);
+
+            if ($validator->failed()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Create lesson failed',
+                    'data' => $validator->errors()
+                ], 400);
+            }
+
+            $topic = Topic::find($request->topic_id);
+
+
+            if (!$topic) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Topic not found'
+                ], 404);
+            }
+
             DB::beginTransaction();
+            $previousLesson = Lesson::where('topic_id', $topic->id)->orderBy('id', 'desc')->first();
 
 
             $lesson = Lesson::create([
@@ -297,7 +301,16 @@ class LessonController extends Controller
                 }
             }
 
+            $user = Auth::user();
+            if ($previousLesson) {
+                $status = $user->lessons()->wherePivot('lesson_id', $previousLesson->id)->wherePivot('user_id', $user->id)->first()->pivot->status;
+                if ($status == 'finished') {
+                    $user->lessons()->attach($lesson->id, ['status' => 'unlocked', 'lives' => 3]);
+                }
+            }
+
             DB::commit();
+
 
             return response()->json([
                 'success' => true,
@@ -361,143 +374,160 @@ class LessonController extends Controller
      */
     public function update_lesson(Request $request, $id)
     {
-        $validator = Validator::make($request->all(), [
-            'title' => 'required|string|max:255',
-            'description' => 'required|string|max:255',
-            'image' => 'nullable|string|max:255',
-            'vocabularies' => 'required|array',
-            'vocabularies.*.id' => 'required|string|max:255',
-            'vocabularies.*.questions' => 'required|array',
-            'vocabularies.*.questions.*.id' => 'required|string|max:255',
-            'vocabularies.*.questions.*.type' => 'required|string|max:255',
-            'vocabularies.*.questions.*.content' => 'required|string|max:255',
-            'vocabularies.*.questions.*.meaning' => 'required|string|max:255',
-            'vocabularies.*.questions.*.answers' => 'required|array',
-            'vocabularies.*.questions.*.answer.*.id' => 'required|string|max:255',
-            'vocabularies.*.questions.*.answer.*.content' => 'required|string|max:255',
-            'vocabularies.*.questions.*.answer.*.is_correct' => 'int|max:1',
-        ]);
+        try {
+            $validator = Validator::make($request->all(), [
+                'title' => 'required|string|max:255',
+                'description' => 'required|string|max:255',
+                'image' => 'nullable|string|max:255',
+                'vocabularies' => 'required|array',
+                'vocabularies.*.id' => 'required|string|max:255',
+                'vocabularies.*.questions' => 'required|array',
+                'vocabularies.*.questions.*.id' => 'required|string|max:255',
+                'vocabularies.*.questions.*.type' => 'required|string|max:255',
+                'vocabularies.*.questions.*.content' => 'required|string|max:255',
+                'vocabularies.*.questions.*.meaning' => 'required|string|max:255',
+                'vocabularies.*.questions.*.answers' => 'required|array',
+                'vocabularies.*.questions.*.answer.*.id' => 'required|string|max:255',
+                'vocabularies.*.questions.*.answer.*.content' => 'required|string|max:255',
+                'vocabularies.*.questions.*.answer.*.is_correct' => 'int|max:1',
+            ]);
 
-        if ($validator->failed()) {
+            if ($validator->failed()) {
+                // return response()->json([
+                //     'success' => false,
+                //     'message' => 'Update lesson failed',
+                //     'data' => $validator->errors()
+                // ], 400);
+                throw new \Exception($validator->errors(), 400);
+            }
+
+            DB::beginTransaction();
+
+            $lesson = Lesson::with('vocabularies')->find($id);
+
+            if (!$lesson) {
+                throw new \Exception('Lesson not found', 404);
+            }
+
+            $lesson->update([
+                'title' => $request->title,
+                'description' => $request->description,
+                'image' => $request->image ?? null,
+            ]);
+
+            $vocabularies = $request->vocabularies;
+            $existItems = [];
+
+            foreach ($vocabularies as $vocabulary) {
+                if (isset($vocabulary['id'])) {
+                    array_push($existItems, $vocabulary['id']);
+                }
+            }
+
+            Vocabulary::whereNotIn('id', $existItems)->where('lesson_id', $lesson->id)->delete();
+
+            foreach ($vocabularies as $vocabulary) {
+                $questions = $vocabulary['questions'];
+
+                $voca = null;
+                if (isset($vocabulary['id'])) {
+                    $voca = Vocabulary::find($vocabulary['id']);
+                }
+                if (!$voca) {
+                    $isExit = Vocabulary::where('word_id', $vocabulary['word_id'])->first();
+                    if ($isExit) {
+                        throw new \Exception('Word has been create in another lesson', 400);
+                    } else {
+                        $voca = Vocabulary::create([
+                            'lesson_id' => $lesson->id,
+                            'user_id' => auth()->user()->id,
+                            'word_id' => $vocabulary['word_id'],
+                        ]);
+                        if (!$voca) {
+                            throw new \Exception('Create vocabulary fails', 500);
+                        }
+                    }
+                } else {
+                    $voca->update([
+                        'word_id' => $vocabulary['word_id'],
+                    ]);
+
+                    //tuong tu vocabularies
+                    $existQuestions = [];
+
+                    foreach ($questions as $question) {
+                        if ($question['id']) {
+                            array_push($existQuestions, $question['id']);
+                        }
+                    }
+
+                    Question::whereNotIn('id', $existQuestions)->where('vocabulary_id', $voca->id)->delete();
+                }
+
+                foreach ($questions as $question) {
+                    if ($question['type'] != 'writing' && $question['type'] != 'choice') {
+                        throw new \Exception('Question Creation Error - Type is not valid', 500);
+                    }
+
+                    $ques = Question::find($question['id']);
+                    if (!$ques) {
+                        $ques = Question::create([
+                            'vocabulary_id' => $voca->id,
+                            'content' => $question['content'],
+                            'meaning' => $question['meaning'],
+                            'type' => $question['type'],
+                        ]);
+                        if (!$ques) {
+                            throw new \Exception('Question create fails', 500);
+                        }
+                    } else {
+                        $ques->update([
+                            'type' => $question['type'],
+                            'content' => $question['content'],
+                            'meaning' => $question['meaning'],
+                        ]);
+                    }
+                    $answers = $question['answers'];
+                    foreach ($answers as $answer) {
+                        $ans = null;
+                        if (isset($answer['content'])) {
+                            $ans = Answer::find($answer['id']);
+                        }
+                        if (!$ans) {
+                            if (isset($answer['content'])) {
+                                $newAnser = Answer::create([
+                                    'question_id' => $ques->id,
+                                    'content' => $answer['content'],
+                                    'is_correct' => $answer['is_correct'],
+                                ]);
+                            }
+                            if (!$newAnser) {
+                                throw new \Exception('Answer create fails', 500);
+                            }
+                        } else {
+                            $ans->update([
+                                'content' => $answer['content'],
+                                'is_correct' => $answer['is_correct'],
+                            ]);
+                        }
+                    }
+                }
+            }
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Update lesson successfully',
+                'lesson' => $lesson
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json([
                 'success' => false,
                 'message' => 'Update lesson failed',
-                'data' => $validator->errors()
-            ], 400);
+                'data' => $e
+            ], $e->getCode());
         }
-
-        $lesson = Lesson::find($request->id);
-
-        if (!$lesson) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Lesson not found',
-            ], 404);
-        }
-
-        $lesson->update([
-            'title' => $request->title,
-            'description' => $request->description,
-            'image' => $request->image ?? null,
-        ]);
-
-        $vocabularies = $request->vocabularies;
-
-        foreach ($vocabularies as $vocabulary) {
-            $voca = null;
-            if (isset($vocabulary['id'])) {
-                $voca = Vocabulary::find($vocabulary['id']);
-            }
-            if (!$voca) {
-                $isExit = Vocabulary::where('word_id', $vocabulary['word_id'])->first();
-                if ($isExit) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Word has been create in another lesson'
-                    ], 400);
-                } else {
-                    $voca = Vocabulary::create([
-                        'lesson_id' => $lesson->id,
-                        'user_id' => auth()->user()->id,
-                        'word_id' => $vocabulary['word_id'],
-                    ]);
-                    if (!$voca) {
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'Create vocabulary fails'
-                        ], 500);
-                    }
-                }
-            } else {
-                $voca->update([
-                    'word_id' => $vocabulary['word_id'],
-                ]);
-            }
-
-            //questions
-            $questions = $vocabulary['questions'];
-            foreach ($questions as $question) {
-                if ($question['type'] != 'writing' && $question['type'] != 'choice') {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Question Creation Error - Type is not valid',
-                    ], 500);
-                }
-
-                $ques = Question::find($question['id']);
-                if (!$ques) {
-                    $ques = Question::create([
-                        'vocabulary_id' => $voca->id,
-                        'content' => $question['content'],
-                        'meaning' => $question['meaning'],
-                        'type' => $question['type'],
-                    ]);
-                    if (!$ques) {
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'Question create fails'
-                        ], 500);
-                    }
-                } else {
-                    $ques->update([
-                        'type' => $question['type'],
-                        'content' => $question['content'],
-                        'meaning' => $question['meaning'],
-                    ]);
-                }
-
-                $answers = $question['answers'];
-                foreach ($answers as $answer) {
-                    $ans = null;
-                    if ($answer['id']) {
-                        $ans = Answer::find($answer['id']);
-                    }
-                    if (!$ans) {
-                        $newAnser = Answer::create([
-                            'question_id' => $ques->id,
-                            'content' => $answer['content'],
-                            'is_correct' => $answer['is_correct'],
-                        ]);
-                        if (!$newAnser) {
-                            return response()->json([
-                                'success' => false,
-                                'message' => 'Answer create fails',
-                            ], 404);
-                        }
-                    } else {
-                        $ans->update([
-                            'content' => $answer['content'],
-                            'is_correct' => $answer['is_correct'],
-                        ]);
-                    }
-                }
-            }
-        }
-        return response()->json([
-            'success' => true,
-            'message' => 'Update lesson successfully',
-            'lesson' => $lesson
-        ], 200);
     }
 
     /**
