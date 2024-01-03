@@ -13,8 +13,6 @@ return new class extends Migration
     {
         Schema::create('cards', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('word_id');
-            $table->foreign('word_id')->references('id')->on('words')->onDelete('cascade');
             $table->unsignedBigInteger('flashcard_id');
             $table->foreign('flashcard_id')->references('id')->on('flashcards')->onDelete('cascade');
             $table->string('status')->default('active');

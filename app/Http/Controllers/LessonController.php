@@ -298,6 +298,7 @@ class LessonController extends Controller
                 }
             }
 
+
             DB::commit();
 
             return response()->json([
@@ -407,7 +408,7 @@ class LessonController extends Controller
             $existItems = [];
 
             foreach ($vocabularies as $vocabulary) {
-                if ($vocabulary['id']) {
+                if (isset($vocabulary['id'])) {
                     array_push($existItems, $vocabulary['id']);
                 }
             }
@@ -479,15 +480,17 @@ class LessonController extends Controller
                     $answers = $question['answers'];
                     foreach ($answers as $answer) {
                         $ans = null;
-                        if ($answer['id']) {
+                        if (isset($answer['content'])) {
                             $ans = Answer::find($answer['id']);
                         }
                         if (!$ans) {
-                            $newAnser = Answer::create([
-                                'question_id' => $ques->id,
-                                'content' => $answer['content'],
-                                'is_correct' => $answer['is_correct'],
-                            ]);
+                            if (isset($answer['content'])) {
+                                $newAnser = Answer::create([
+                                    'question_id' => $ques->id,
+                                    'content' => $answer['content'],
+                                    'is_correct' => $answer['is_correct'],
+                                ]);
+                            }
                             if (!$newAnser) {
                                 throw new \Exception('Answer create fails', 500);
                             }
@@ -512,7 +515,7 @@ class LessonController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Update lesson failed',
-                'data' => $e->getMessage()
+                'data' => $e
             ], $e->getCode());
         }
     }
