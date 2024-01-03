@@ -10,6 +10,7 @@ use App\Models\Vocabulary;
 use App\Models\Word;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Throwable;
@@ -162,41 +163,43 @@ class LessonController extends Controller
      */
     public function create_lesson(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'topic_id' => 'required|exists:topics,id',
-            'title' => 'required|string',
-            'description' => 'required|string',
-            'image' => 'nullable|string',
-            'vocabularies' => 'required|array',
-            'vocabularies.*.word_id' => 'required|string|max:255',
-            'vocabularies.*.questions' => 'required|array',
-            'vocabularies.*.questions.*.type' => 'required|string|max:255',
-            'vocabularies.*.questions.*.content' => 'required|string|max:255',
-            'vocabularies.*.questions.*.meaning' => 'required|string|max:255',
-            'vocabularies.*.questions.*.answers' => 'required|array',
-            'vocabularies.*.questions.*.answer.*.content' => 'required|string|max:255',
-            'vocabularies.*.questions.*.answer.*.is_correct' => 'int|max:1',
-        ]);
-
-        if ($validator->failed()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Create lesson failed',
-                'data' => $validator->errors()
-            ], 400);
-        }
-
-        $topic = Topic::find($request->topic_id);
-
-        if (!$topic) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Topic not found'
-            ], 404);
-        }
-
         try {
+            $validator = Validator::make($request->all(), [
+                'topic_id' => 'required|exists:topics,id',
+                'title' => 'required|string',
+                'description' => 'required|string',
+                'image' => 'nullable|string',
+                'vocabularies' => 'required|array',
+                'vocabularies.*.word_id' => 'required|string|max:255',
+                'vocabularies.*.questions' => 'required|array',
+                'vocabularies.*.questions.*.type' => 'required|string|max:255',
+                'vocabularies.*.questions.*.content' => 'required|string|max:255',
+                'vocabularies.*.questions.*.meaning' => 'required|string|max:255',
+                'vocabularies.*.questions.*.answers' => 'required|array',
+                'vocabularies.*.questions.*.answer.*.content' => 'required|string|max:255',
+                'vocabularies.*.questions.*.answer.*.is_correct' => 'int|max:1',
+            ]);
+
+            if ($validator->failed()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Create lesson failed',
+                    'data' => $validator->errors()
+                ], 400);
+            }
+
+            $topic = Topic::find($request->topic_id);
+
+
+            if (!$topic) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Topic not found'
+                ], 404);
+            }
+
             DB::beginTransaction();
+            $previousLesson = Lesson::where('topic_id', $topic->id)->orderBy('id', 'desc')->first();
 
 
             $lesson = Lesson::create([
@@ -298,8 +301,16 @@ class LessonController extends Controller
                 }
             }
 
+            $user = Auth::user();
+            if ($previousLesson) {
+                $status = $user->lessons()->wherePivot('lesson_id', $previousLesson->id)->wherePivot('user_id', $user->id)->first()->pivot->status;
+                if ($status == 'finished') {
+                    $user->lessons()->attach($lesson->id, ['status' => 'unlocked', 'lives' => 3]);
+                }
+            }
 
             DB::commit();
+
 
             return response()->json([
                 'success' => true,
@@ -476,7 +487,6 @@ class LessonController extends Controller
                             'meaning' => $question['meaning'],
                         ]);
                     }
-
                     $answers = $question['answers'];
                     foreach ($answers as $answer) {
                         $ans = null;
