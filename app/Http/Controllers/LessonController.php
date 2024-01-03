@@ -412,9 +412,11 @@ class LessonController extends Controller
                 }
             }
 
-            $missingVocabularies = Vocabulary::whereNotIn('id', $existItems)->where('lesson_id', $lesson->id)->delete();;
-            
+            Vocabulary::whereNotIn('id', $existItems)->where('lesson_id', $lesson->id)->delete();
+
             foreach ($vocabularies as $vocabulary) {
+                $questions = $vocabulary['questions'];
+
                 $voca = null;
                 if (isset($vocabulary['id'])) {
                     $voca = Vocabulary::find($vocabulary['id']);
@@ -437,10 +439,19 @@ class LessonController extends Controller
                     $voca->update([
                         'word_id' => $vocabulary['word_id'],
                     ]);
+
+                    //tuong tu vocabularies
+                    $existQuestions = [];
+
+                    foreach ($questions as $question) {
+                        if ($question['id']) {
+                            array_push($existQuestions, $question['id']);
+                        }
+                    }
+
+                    Question::whereNotIn('id', $existQuestions)->where('vocabulary_id', $voca->id)->delete();
                 }
 
-                //questions
-                $questions = $vocabulary['questions'];
                 foreach ($questions as $question) {
                     if ($question['type'] != 'writing' && $question['type'] != 'choice') {
                         throw new \Exception('Question Creation Error - Type is not valid', 500);
