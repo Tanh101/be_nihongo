@@ -24,3 +24,6 @@ docker/mysql/
 docker/nginx_log/
 data/
 storage/logs/
+data.json
+checkDuplicated.py
+unique_words_output.json

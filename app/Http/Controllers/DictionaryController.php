@@ -496,4 +496,143 @@ class DictionaryController extends Controller
             'dictionaries' => $resultWords
         ], 200);
     }
+
+    /**
+     * @OA\Post(
+     *      path="/api/dashboard/dictionary-duplicate",
+     *      tags={"Duplicated Dictionary"},
+     *      summary="Create new dictionary",
+     *      security={{"bearerAuth":{}}},
+     *      @OA\RequestBody(
+     *        required=true,
+     *        @OA\JsonContent(
+     *          required={"dictionaries"},
+     *          @OA\Property(
+     *            property="dictionaries",
+     *            type="array",
+     *            @OA\Items(
+     *              type="object",
+     *              required={"word", "sino_vietnamese", "pronunciation", "means"},
+     *              @OA\Property(
+     *                property="word",
+     *                type="string",
+     *                description="Word",
+     *                example="突く"
+     *              ),
+     *              @OA\Property(
+     *                property="pronunciation",
+     *                type="string",
+     *                description="Pronunciation",
+     *                example="つく"
+     *              ),
+     *              @OA\Property(
+     *                property="sino_vietnamese",
+     *                type="string",
+     *                description="Sino Vietnamese",
+     *                example="ĐỘT"
+     *              ),
+     *              @OA\Property(
+     *                property="means",
+     *                type="array",
+     *                @OA\Items(
+     *                  type="object",
+     *                  required={"meaning"},
+     *                  @OA\Property(
+     *                      property="meaning",
+     *                      type="string",
+     *                      description="Meaning",
+     *                      example="đâm"
+     *                  ),
+     *                  @OA\Property(
+     *                      property="example",
+     *                      type="string",
+     *                      description="Example",
+     *                      example="ファークで肉を突く。"
+     *                  ),
+     *                  @OA\Property(
+     *                      property="example_meaning",
+     *                      type="string",
+     *                      description="Example Meaning",
+     *                      example="Dùng dao đâm vào thịt"
+     *                  ),
+     *                ),
+     *              ),
+     *            ),
+     *          ),
+     *        ),
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Create dictionary success",
+     *      ),
+     *      @OA\Response(
+     *          response=500,
+     *          description="Server errror",
+     *      ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Validation error",
+     *      ),
+     *     )
+     */
+    public function createDuplicateDictionary(Request $request)
+    {
+        $dictionaryArray = [];
+        $validator = Validator::make($request->all(), [
+            'dictionaries' => 'required|array',
+            'dictionaries.*.word' => 'required|string',
+            'dictionaries.*.pronunciation' => 'required|string',
+            'dictionaries.*.sino_vietnamese' => 'string',
+            'dictionaries.*.means' => 'required|array',
+            'dictionaries.*.means.*.meaning' => 'required|string',
+            'dictionaries.*.means.*.example' => 'string',
+            'dictionaries.*.means.*.example_meaning' => 'string',
+            'dictionaries.*.means.*.image' => 'string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $validator->errors()
+            ], 400);
+        }
+
+
+        $dictionaries = $request->input('dictionaries');
+        foreach ($dictionaries as $dictionary) {
+            $isExitWord = Word::where('word', $dictionary['word'])->first();
+            if (!$isExitWord) {
+                $newWord = Word::create([
+                    'word' => $dictionary['word'],
+                    'pronunciation' => $dictionary['pronunciation'],
+                    'sino_vietnamese' => $dictionary['sino_vietnamese'] ?? null,
+                    'image' => $dictionary['image'] ?? null,
+                ]);
+
+                if (!$newWord) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Failed to create word'
+                    ], 500);
+                }
+                $means = $dictionary['means'];
+                foreach ($means as $mean) {
+                    Mean::create([
+                        'meaning' => $mean['meaning'],
+                        'word_id' => $newWord->id,
+                        'example' => $mean['example'] ?? null,
+                        'example_meaning' => $mean['example_meaning'] ?? null,
+                        'image' => $mean['image'] ?? null,
+                    ]);
+                }
+
+                array_push($dictionaryArray, $newWord->load('means'));
+            }
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'dictionaries' => $dictionaryArray
+        ], 200);
+    }
 }

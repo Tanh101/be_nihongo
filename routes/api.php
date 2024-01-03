@@ -86,6 +86,9 @@ Route::group([
 
     //analytics
     Route::get("analytics", [AnalyticsController::class, "getAnalytics"]);
+
+    //dictionary-duplicate
+    Route::post("dictionary-duplicate", [DictionaryController::class, "createDuplicateDictionary"]);
 });
 
 //Topics API
@@ -173,7 +176,6 @@ Route::group([
 
 //search
 Route::get("/search", [DictionaryController::class, "searchWordToCreateLesson"]);
-
 
 //learn flashcard api
 // Route::group([

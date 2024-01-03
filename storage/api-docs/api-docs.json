@@ -512,6 +512,101 @@
                 ]
             }
         },
+        "/api/dashboard/dictionary-duplicate": {
+            "post": {
+                "tags": [
+                    "Duplicated Dictionary"
+                ],
+                "summary": "Create new dictionary",
+                "operationId": "8900a288bae0dcbc573d65238cb26441",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "dictionaries"
+                                ],
+                                "properties": {
+                                    "dictionaries": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "word",
+                                                "sino_vietnamese",
+                                                "pronunciation",
+                                                "means"
+                                            ],
+                                            "properties": {
+                                                "word": {
+                                                    "description": "Word",
+                                                    "type": "string",
+                                                    "example": "突く"
+                                                },
+                                                "pronunciation": {
+                                                    "description": "Pronunciation",
+                                                    "type": "string",
+                                                    "example": "つく"
+                                                },
+                                                "sino_vietnamese": {
+                                                    "description": "Sino Vietnamese",
+                                                    "type": "string",
+                                                    "example": "ĐỘT"
+                                                },
+                                                "means": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "required": [
+                                                            "meaning"
+                                                        ],
+                                                        "properties": {
+                                                            "meaning": {
+                                                                "description": "Meaning",
+                                                                "type": "string",
+                                                                "example": "đâm"
+                                                            },
+                                                            "example": {
+                                                                "description": "Example",
+                                                                "type": "string",
+                                                                "example": "ファークで肉を突く。"
+                                                            },
+                                                            "example_meaning": {
+                                                                "description": "Example Meaning",
+                                                                "type": "string",
+                                                                "example": "Dùng dao đâm vào thịt"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Create dictionary success"
+                    },
+                    "500": {
+                        "description": "Server errror"
+                    },
+                    "400": {
+                        "description": "Validation error"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/flashcard": {
             "get": {
                 "tags": [
