@@ -1,0 +1,533 @@
+[
+  {
+    "topic_id": "2",
+    "title": "Các từ vựng về cảm giác",
+    "description": "Cách đọc của các từ hán tự",
+    "vocabularies": [
+      {
+        "word_id": "394",
+        "questions": [
+          {
+            "content": "今日はとても?ですね。",
+            "meaning": "Hôm nay thời tiết rất lạnh.",
+            "type": "choice",
+            "answers": [
+              {
+                "content": "寒い",
+                "is_correct": 1
+              },
+              {
+                "content": "暑い",
+                "is_correct": 0
+              },
+              {
+                "content": "楽しい",
+                "is_correct": 0
+              },
+              {
+                "content": "悲しい",
+                "is_correct": 0
+              }
+            ]
+          },
+          {
+            "content": "冬の日本はとても?。",
+            "meaning": "Mùa đông ở Nhật Bản rất lạnh.",
+            "type": "choice",
+            "answers": [
+              {
+                "content": "寒い",
+                "is_correct": 1
+              },
+              {
+                "content": "暑い",
+                "is_correct": 0
+              },
+              {
+                "content": "楽しい",
+                "is_correct": 0
+              },
+              {
+                "content": "悲しい",
+                "is_correct": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "word_id": "401",
+        "questions": [
+          {
+            "content": "夏はとても?です。",
+            "meaning": "Mùa hè rất nóng.",
+            "type": "choice",
+            "answers": [
+              {
+                "content": "暑い",
+                "is_correct": 1
+              },
+              {
+                "content": "寒い",
+                "is_correct": 0
+              },
+              {
+                "content": "楽しい",
+                "is_correct": 0
+              },
+              {
+                "content": "悲しい",
+                "is_correct": 0
+              }
+            ]
+          },
+          {
+            "content": "エアコンをつけてもまだ?。",
+            "meaning": "Ngay cả khi bật điều hòa, vẫn còn nóng.",
+            "type": "choice",
+            "answers": [
+              {
+                "content": "暑い",
+                "is_correct": 1
+              },
+              {
+                "content": "寒い",
+                "is_correct": 0
+              },
+              {
+                "content": "楽しい",
+                "is_correct": 0
+              },
+              {
+                "content": "悲しい",
+                "is_correct": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "word_id": "402",
+        "questions": [
+          {
+            "content": "パーティーはとても?だった。",
+            "meaning": "Bữa tiệc thật sự vui vẻ.",
+            "type": "choice",
+            "answers": [
+              {
+                "content": "楽しい",
+                "is_correct": 1
+              },
+              {
+                "content": "悲しい",
+                "is_correct": 0
+              },
+              {
+                "content": "寒い",
+                "is_correct": 0
+              },
+              {
+                "content": "暑い",
+                "is_correct": 0
+              }
+            ]
+          },
+          {
+            "content": "友達と一緒に遊ぶのはいつも?。",
+            "meaning": "Luôn vui khi chơi cùng bạn bè.",
+            "type": "choice",
+            "answers": [
+              {
+                "content": "楽しい",
+                "is_correct": 1
+              },
+              {
+                "content": "悲しい",
+                "is_correct": 0
+              },
+              {
+                "content": "寒い",
+                "is_correct": 0
+              },
+              {
+                "content": "暑い",
+                "is_correct": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "word_id": "403",
+        "questions": [
+          {
+            "content": "映画の結末がとても?だった。",
+            "meaning": "Phần kết của bộ phim thật là buồn.",
+            "type": "choice",
+            "answers": [
+              {
+                "content": "悲しい",
+                "is_correct": 1
+              },
+              {
+                "content": "楽しい",
+                "is_correct": 0
+              },
+              {
+                "content": "寒い",
+                "is_correct": 0
+              },
+              {
+                "content": "暑い",
+                "is_correct": 0
+              }
+            ]
+          },
+          {
+            "content": "友達が去ってしまってとても?気分。",
+            "meaning": "Cảm giác rất buồn khi bạn bè rời đi.",
+            "type": "choice",
+            "answers": [
+              {
+                "content": "悲しい",
+                "is_correct": 1
+              },
+              {
+                "content": "楽しい",
+                "is_correct": 0
+              },
+              {
+                "content": "寒い",
+                "is_correct": 0
+              },
+              {
+                "content": "暑い",
+                "is_correct": 0
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "topic_id": "3",
+    "title": "Lesson từ vựng về các môn học",
+    "description": "Cách đọc của các từ hán tự",
+    "vocabularies": [
+      {
+        "word_id": "237",
+        "questions": [
+          {
+            "content": "彼女は?が得意です。",
+            "meaning": "Cô ấy giỏi hóa học.",
+            "type": "choice",
+            "answers": [
+              {
+                "content": "化学",
+                "is_correct": 1
+              },
+              {
+                "content": "数学",
+                "is_correct": 0
+              },
+              {
+                "content": "歴史",
+                "is_correct": 0
+              },
+              {
+                "content": "地理",
+                "is_correct": 0
+              }
+            ]
+          },
+          {
+            "content": "?の実験は難しい。",
+            "meaning": "Thí nghiệm hóa học khó khăn.",
+            "type": "choice",
+            "answers": [
+              {
+                "content": "化学",
+                "is_correct": 1
+              },
+              {
+                "content": "数学",
+                "is_correct": 0
+              },
+              {
+                "content": "歴史",
+                "is_correct": 0
+              },
+              {
+                "content": "地理",
+                "is_correct": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "word_id": "234",
+        "questions": [
+          {
+            "content": "彼は?が好きです。",
+            "meaning": "Anh ấy thích toán học.",
+            "type": "choice",
+            "answers": [
+              {
+                "content": "数学",
+                "is_correct": 1
+              },
+              {
+                "content": "化学",
+                "is_correct": 0
+              },
+              {
+                "content": "歴史",
+                "is_correct": 0
+              },
+              {
+                "content": "地理",
+                "is_correct": 0
+              }
+            ]
+          },
+          {
+            "content": "?の問題は難しい。",
+            "meaning": "Các vấn đề toán học khó khăn.",
+            "type": "choice",
+            "answers": [
+              {
+                "content": "数学",
+                "is_correct": 1
+              },
+              {
+                "content": "化学",
+                "is_correct": 0
+              },
+              {
+                "content": "歴史",
+                "is_correct": 0
+              },
+              {
+                "content": "地理",
+                "is_correct": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "word_id": "233",
+        "questions": [
+          {
+            "content": "?が好きですか。",
+            "meaning": "Bạn thích lịch sử không?",
+            "type": "choice",
+            "answers": [
+              {
+                "content": "歴史",
+                "is_correct": 1
+              },
+              {
+                "content": "数学",
+                "is_correct": 0
+              },
+              {
+                "content": "化学",
+                "is_correct": 0
+              },
+              {
+                "content": "地理",
+                "is_correct": 0
+              }
+            ]
+          },
+          {
+            "content": "?の出来事を学びたい。",
+            "meaning": "Tôi muốn học về sự kiện lịch sử.",
+            "type": "choice",
+            "answers": [
+              {
+                "content": "歴史",
+                "is_correct": 1
+              },
+              {
+                "content": "数学",
+                "is_correct": 0
+              },
+              {
+                "content": "化学",
+                "is_correct": 0
+              },
+              {
+                "content": "地理",
+                "is_correct": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "word_id": "235",
+        "questions": [
+          {
+            "content": "?の知識が必要です。",
+            "meaning": "Bạn cần kiến thức về địa lý.",
+            "type": "choice",
+            "answers": [
+              {
+                "content": "地理",
+                "is_correct": 1
+              },
+              {
+                "content": "数学",
+                "is_correct": 0
+              },
+              {
+                "content": "化学",
+                "is_correct": 0
+              },
+              {
+                "content": "歴史",
+                "is_correct": 0
+              }
+            ]
+          },
+          {
+            "content": "?の本は面白いです。",
+            "meaning": "Sách về địa lý thú vị.",
+            "type": "choice",
+            "answers": [
+              {
+                "content": "地理",
+                "is_correct": 1
+              },
+              {
+                "content": "数学",
+                "is_correct": 0
+              },
+              {
+                "content": "化学",
+                "is_correct": 0
+              },
+              {
+                "content": "歴史",
+                "is_correct": 0
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "topic_id": "3",
+    "title": "Lesson từ vựng về các môn học",
+    "description": "Cách đọc của các từ hán tự",
+    "vocabularies": [
+      {
+        "word_id": "404",
+        "questions": [
+          {
+            "content": "彼は?が得意です。",
+            "meaning": "Anh ấy giỏi vật lý.",
+            "type": "choice",
+            "answers": [
+              {
+                "content": "物理",
+                "is_correct": 1
+              },
+              {
+                "content": "英語",
+                "is_correct": 0
+              },
+              {
+                "content": "数学",
+                "is_correct": 0
+              },
+              {
+                "content": "歴史",
+                "is_correct": 0
+              }
+            ]
+          },
+          {
+            "content": "?の授業は面白い。",
+            "meaning": "Bài giảng vật lý thú vị.",
+            "type": "choice",
+            "answers": [
+              {
+                "content": "物理",
+                "is_correct": 1
+              },
+              {
+                "content": "英語",
+                "is_correct": 0
+              },
+              {
+                "content": "数学",
+                "is_correct": 0
+              },
+              {
+                "content": "歴史",
+                "is_correct": 0
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "word_id": "405",
+        "questions": [
+          {
+            "content": "彼女は?が得意です。",
+            "meaning": "Cô ấy giỏi tiếng Anh.",
+            "type": "choice",
+            "answers": [
+              {
+                "content": "英語",
+                "is_correct": 1
+              },
+              {
+                "content": "物理",
+                "is_correct": 0
+              },
+              {
+                "content": "数学",
+                "is_correct": 0
+              },
+              {
+                "content": "歴史",
+                "is_correct": 0
+              }
+            ]
+          },
+          {
+            "content": "?の本は難しい。",
+            "meaning": "Sách tiếng Anh khó.",
+            "type": "choice",
+            "answers": [
+              {
+                "content": "英語",
+                "is_correct": 1
+              },
+              {
+                "content": "物理",
+                "is_correct": 0
+              },
+              {
+                "content": "数学",
+                "is_correct": 0
+              },
+              {
+                "content": "歴史",
+                "is_correct": 0
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+]
