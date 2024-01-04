@@ -243,7 +243,8 @@ class DictionaryController extends Controller
                 ->leftJoin('vocabularies', 'words.id', '=', 'vocabularies.word_id')
                 ->join('means', 'words.id', '=', 'means.word_id')
                 ->whereNull('vocabularies.word_id')
-                ->select('words.*') // Select columns from both tables
+                ->select('words.*')
+                ->distinct()
                 ->limit($limit)
                 ->get();
         } else {
@@ -253,6 +254,7 @@ class DictionaryController extends Controller
                 ->whereNull('vocabularies.word_id')
                 ->where('words.word', 'like', '%' . $word . '%')
                 ->select('words.*')
+                ->distinct()
                 ->limit($limit)
                 ->get();
         }
